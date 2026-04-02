@@ -1,0 +1,28 @@
+# Installed packages (auto-installed by use-package)
+elpa/
+
+# Compiled tree-sitter grammars (auto-compiled on first start)
+tree-sitter/
+
+# Native compilation cache
+eln-cache/
+
+# Backup and auto-save files
+backups/
+auto-saves/
+auto-save-list/
+
+# Session and state files
+.mc-lists.el
+projectile-bookmarks.eld
+.cache/
+eshell/
+transient/
+agent/
+projects
+
+# Emacs custom (regenerated automatically)
+custom.el
+
+# OS files
+.DS_Store

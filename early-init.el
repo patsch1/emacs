@@ -10,4 +10,6 @@
 ;; Higher GC threshold during startup, reset after
 (setq gc-cons-threshold most-positive-fixnum)
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold 800000)))
+          (lambda ()
+            (setq gc-cons-threshold 100000000
+                  read-process-output-max (* 1024 1024))))

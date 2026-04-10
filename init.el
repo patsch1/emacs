@@ -46,10 +46,9 @@
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups/"))
       auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-saves/" t)))
 
-;; Add to PATH
-(add-to-list 'exec-path "/usr/local/bin/")
-(add-to-list 'exec-path (expand-file-name "~/.local/bin/"))
-(add-to-list 'exec-path (expand-file-name "~/Library/Python/3.9/bin/"))
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
 
 ;; Look 'n feel
 ;;
@@ -253,3 +252,19 @@
         (list (expand-file-name "~/.local/bin/agent") "acp")))
 
 (load "~/.emacs.d/common-dev-modes.el")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil)
+ '(package-vc-selected-packages
+   '((agent-shell :vc-backend Git :url
+		  "https://github.com/xenodium/agent-shell")
+     (acp :vc-backend Git :url "https://github.com/xenodium/acp.el"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

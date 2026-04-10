@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-04-10
+
+### Fix
+
+- eglot/Python: `gc-cons-threshold` nach Startup auf 100 MB statt 800 KB (verhindert permanente GC-Pausen bei großen LSP-Antworten → "reconnected"-Schleife)
+- eglot/Python: `read-process-output-max` auf 1 MB gesetzt (Default 4 KB war Flaschenhals für pyright-Kommunikation)
+- Manuelle `exec-path`-Einträge durch `exec-path-from-shell` ersetzt — liest das vollständige PATH aus der Login-Shell, damit GUI-Emacs alle Binaries findet (node, pyright-langserver etc.)
+
 ## 2026-03-19 (8)
 
 ### Refactor

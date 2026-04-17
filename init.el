@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Package Setup
 
 (require 'package)
@@ -16,17 +18,22 @@
 (setq use-package-always-ensure t)
 
 ;; Auto-refresh stale package archives on install failure
-(defvar my/package-refreshed nil)
 (defun my/package-install-retry (fn &rest args)
-  "Retry package install after refreshing archives once."
+  "Retry package install once after refreshing archives.
+Re-signals the error from the retry if it still fails."
   (condition-case _
       (apply fn args)
     (error
-     (unless my/package-refreshed
-       (setq my/package-refreshed t)
-       (package-refresh-contents)
-       (apply fn args)))))
+     (package-refresh-contents)
+     (condition-case err2
+         (apply fn args)
+       (error (signal (car err2) (cdr err2)))))))
 (advice-add 'package-install :around #'my/package-install-retry)
+
+;; Externalise Custom into its own file so init.el stays hand-written only.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file :noerror))
 
 ;;;;; End Package Setup
 
@@ -46,7 +53,15 @@
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups/"))
       auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-saves/" t)))
 
+;; Ensure backup directories exist so Emacs doesn't silently skip backups
+(dolist (dir '("~/.emacs.d/backups/" "~/.emacs.d/auto-saves/"))
+  (let ((expanded (expand-file-name dir)))
+    (unless (file-directory-p expanded)
+      (make-directory expanded t))))
+
+;; Only needed in GUI Emacs; terminal sessions inherit the shell env already.
 (use-package exec-path-from-shell
+  :when (memq window-system '(mac ns x))
   :config
   (exec-path-from-shell-initialize))
 
@@ -58,11 +73,12 @@
 (when (find-font (font-spec :name "SauceCodePro NF"))
   (set-frame-font "SauceCodePro NF 14" nil t))
 
-;; Relative line-numbers
+;; Relative line-numbers (only in code/text buffers, not magit/dired/help/etc.)
 (setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode 1)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
 
-;; Highlight matching parens
+;; Highlight matching parens (built-in; smartparens handles structural editing)
 (show-paren-mode 1)
 
 ;; Color-coded delimiters by nesting depth
@@ -72,7 +88,8 @@
 ;; Show column numbers
 (column-number-mode 1)
 
-;; Symlink resolution for modeline display
+;; Resolve symlinks in visited file names (affects buffer-file-name, modeline, VC).
+;; Trade-off: projects accessed via symlink show the underlying absolute path.
 (setq find-file-visit-truename t)
 
 ;; Ivy
@@ -150,8 +167,7 @@
 
 ;; Doom modeline
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  :init (doom-modeline-mode 1))
 
 ;; Show possible key combinations
 (use-package which-key
@@ -199,7 +215,7 @@
   :hook (prog-mode . smartparens-mode))
 
 (use-package multi-term
-  :custom (multi-term-program "/bin/zsh"))
+  :custom (multi-term-program (or (getenv "SHELL") "/bin/zsh")))
 
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))
@@ -235,36 +251,24 @@
          ("C-h x" . helpful-command)))
 
 ;; AI Agent shell (Cursor CLI via ACP)
-(unless (package-installed-p 'acp)
-  (package-vc-install "https://github.com/xenodium/acp.el"))
-(unless (package-installed-p 'agent-shell)
-  (package-vc-install "https://github.com/xenodium/agent-shell"))
-
+;; Pinned revisions keep installs reproducible; bump SHAs intentionally.
 (use-package shell-maker)
 
+(use-package acp
+  :vc (:url "https://github.com/xenodium/acp.el"
+       :rev "863f2d62c4b4da8b229581be42d490a7403b2eb1"))
+
 (use-package agent-shell
-  :ensure nil
+  :vc (:url "https://github.com/xenodium/agent-shell"
+       :rev "209c413f468594a9ad291805b424eb2f7b769767")
   :after (acp shell-maker)
+  :commands agent-shell
   :bind ("C-c a" . agent-shell)
   :config
   (require 'agent-shell-cursor)
-  (setq agent-shell-cursor-acp-command
-        (list (expand-file-name "~/.local/bin/agent") "acp")))
+  (let ((agent-bin (expand-file-name "~/.local/bin/agent")))
+    (when (file-executable-p agent-bin)
+      (setq agent-shell-cursor-acp-command (list agent-bin "acp")))))
 
-(load "~/.emacs.d/common-dev-modes.el")
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil)
- '(package-vc-selected-packages
-   '((agent-shell :vc-backend Git :url
-		  "https://github.com/xenodium/agent-shell")
-     (acp :vc-backend Git :url "https://github.com/xenodium/acp.el"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(require 'common-dev-modes)

@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-04-17 (2)
+
+### Feat
+
+- YAML Tree-sitter: `yaml-ts-mode` via `major-mode-remap-alist`, Grammar `ikatyang/tree-sitter-yaml` beim Start kompiliert (greift automatisch für alle `.yml`/`.yaml` und `Taskfile`-Dateien)
+
+### Fix
+
+- `acp` und `agent-shell` via `use-package :vc` mit Commit-Pin installiert (reproduzierbare Builds, kein stummer HEAD-Drift mehr)
+- Tree-sitter Grammar-Install in `condition-case` gekapselt — Startup bricht nicht mehr ab bei fehlendem C-Compiler oder Netzwerk-Problem
+- LSP-Binary-Pfade (`expert`, `agent`) nur registriert wenn `file-executable-p` → keine toten Eglot-/Agent-Shell-Aufrufe
+- `multi-term-program` liest `$SHELL` statt hartes `/bin/zsh` (Portabilität)
+- `display-line-numbers-mode` nur in `prog-mode`/`text-mode` (kein Noise in magit/dired/help/treemacs)
+- `my/package-install-retry` propagiert Original-Fehler wenn Retry fehlschlägt (vorher stumm geschluckt); Refresh-Flag entfernt (Retry läuft jetzt verlässlich pro Install-Aufruf)
+- Backup- und Auto-Save-Verzeichnisse werden beim Start angelegt falls fehlend (verhinderte zuvor stumm übersprungene Backups)
+- `exec-path-from-shell` nur im GUI-Emacs (`mac`/`ns`/`x`) aktiv — spart ~650 ms beim Terminal-Start
+
+### Refactor
+
+- `lexical-binding: t` Header in `early-init.el`, `init.el`, `common-dev-modes.el` (vermeidet Closure-Bugs, schnellere Interpretation)
+- `custom.el` aus `init.el` ausgelagert; `custom-file` explizit gesetzt — `init.el` enthält jetzt ausschließlich handgeschriebenen Code
+- `common-dev-modes.el` nach `lisp/` verschoben und stellt `(provide 'common-dev-modes)` bereit; `init.el` nutzt `require` statt hardkodierten `load`-Pfad (verhindert Warning *„your load-path seems to contain your user-emacs-directory"*)
+- `package-vc-install` + `package-vc-selected-packages` Duplikate entfernt — Installation läuft nur noch über `use-package :vc`
+- `doom-modeline-height` Override entfernt (Default 25 statt 15 → Icons/Text nicht mehr abgeschnitten)
+- `show-paren-mode` Kommentar präzisiert (Abgrenzung zu `smartparens`)
+- `find-file-visit-truename` Kommentar präzisiert (Trade-off dokumentiert)
+- Docstring auf `file-name-handler-alist-original` ergänzt
+
+### Docs
+
+- README: Kubel korrekt als Kubernetes-UI (nicht Sprach-Mode) eingeordnet
+- README: YAML/Taskfile-Tabelle zeigt jetzt Tree-sitter-Status
+- README: `custom.el` in File-Structure-Tabelle ergänzt
+
 ## 2026-04-17
 
 ### Feat

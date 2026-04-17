@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Treesitter
 ;; Both GUI app and Homebrew CLI must be the same Emacs version to avoid
 ;; tree-sitter ABI mismatches when compiling grammars.
@@ -10,13 +12,20 @@
           (python "https://github.com/tree-sitter/tree-sitter-python")
           (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml")
           (nix "https://github.com/nix-community/tree-sitter-nix")))
   (setq major-mode-remap-alist
         '((elixir-mode . elixir-ts-mode)
-          (python-mode . python-ts-mode)))
+          (python-mode . python-ts-mode)
+          (yaml-mode . yaml-ts-mode)))
   (dolist (grammar treesit-language-source-alist)
-    (unless (treesit-language-available-p (car grammar))
-      (treesit-install-language-grammar (car grammar)))))
+    (let ((lang (car grammar)))
+      (unless (treesit-language-available-p lang)
+        (condition-case err
+            (treesit-install-language-grammar lang)
+          (error
+           (message "Tree-sitter grammar install failed for %s: %s"
+                    lang (error-message-string err))))))))
 
 ;; LSP via eglot (built-in)
 ;; Install LSPs:
@@ -25,8 +34,10 @@
 (use-package eglot
   :ensure nil
   :config
-  (add-to-list 'eglot-server-programs
-               `(elixir-ts-mode ,(expand-file-name "~/.local/bin/expert") "--stdio")))
+  (let ((expert-bin (expand-file-name "~/.local/bin/expert")))
+    (when (file-executable-p expert-bin)
+      (add-to-list 'eglot-server-programs
+                   `(elixir-ts-mode ,expert-bin "--stdio")))))
 
 ;; Elixir
 (use-package elixir-ts-mode
@@ -61,3 +72,5 @@
   :commands (kubel)
   :config
   (fset 'k8s 'kubel))
+
+(provide 'common-dev-modes)

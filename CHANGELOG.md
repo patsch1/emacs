@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-04-17
+
+### Feat
+
+- Nix-Support: `nix-ts-mode` (tree-sitter) via MELPA; Grammar `nix-community/tree-sitter-nix` wird beim Start automatisch kompiliert
+- Taskfile-Support: Dateien ohne Extension namens `Taskfile`/`taskfile` werden als YAML erkannt (`.yml`/`.yaml`-Varianten waren bereits durch `yaml-mode` abgedeckt)
+
 ## 2026-04-10
 
 ### Fix

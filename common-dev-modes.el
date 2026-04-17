@@ -9,7 +9,8 @@
           (elixir "https://github.com/elixir-lang/tree-sitter-elixir")
           (python "https://github.com/tree-sitter/tree-sitter-python")
           (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-          (toml "https://github.com/tree-sitter/tree-sitter-toml")))
+          (toml "https://github.com/tree-sitter/tree-sitter-toml")
+          (nix "https://github.com/nix-community/tree-sitter-nix")))
   (setq major-mode-remap-alist
         '((elixir-mode . elixir-ts-mode)
           (python-mode . python-ts-mode)))
@@ -49,7 +50,12 @@
   :init (setq markdown-command "multimarkdown"))
 
 (use-package yaml-mode
-  :mode "\\.ya?ml\\'")
+  :mode (("\\.ya?ml\\'" . yaml-mode)
+         ("\\`[Tt]askfile\\'" . yaml-mode)))
+
+;; Nix
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
 
 (use-package kubel
   :commands (kubel)

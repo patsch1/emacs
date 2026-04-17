@@ -25,7 +25,7 @@ Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
 |---|---|
 | `early-init.el` | Startup-Optimierungen (GC, file-handler) |
 | `init.el` | Hauptkonfiguration (UI, Editor, Git, AI) |
-| `common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, YAML, Markdown, Kubernetes) |
+| `common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown, Kubernetes) |
 
 ## Keybindings
 
@@ -135,6 +135,8 @@ In Magit Status:
 | Dockerfile | `dockerfile-ts-mode` | Ja | - |
 | TOML | `toml-ts-mode` | Ja | - |
 | YAML | `yaml-mode` | - | - |
+| Taskfile | `yaml-mode` (`Taskfile.yml` / `Taskfile`) | - | - |
+| Nix | `nix-ts-mode` | Ja | - |
 | Markdown | `markdown-mode` / `gfm-mode` | - | - |
 | JSON | `json-ts-mode` (built-in) | Ja | - |
 

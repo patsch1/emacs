@@ -13,6 +13,7 @@
           (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")
+          (json "https://github.com/tree-sitter/tree-sitter-json")
           (nix "https://github.com/nix-community/tree-sitter-nix")))
   (setq major-mode-remap-alist
         '((elixir-mode . elixir-ts-mode)
@@ -39,16 +40,30 @@
       (add-to-list 'eglot-server-programs
                    `(elixir-ts-mode ,expert-bin "--stdio")))))
 
-;; Elixir
+;; Elixir (formatting handled by apheleia)
 (use-package elixir-ts-mode
-  :hook (elixir-ts-mode . eglot-ensure)
-  :hook (elixir-ts-mode . (lambda () (add-hook 'before-save-hook #'eglot-format nil t))))
+  :hook (elixir-ts-mode . eglot-ensure))
 
-;; Python
+;; Python (formatting handled by apheleia)
 (use-package python
   :ensure nil
-  :hook (python-ts-mode . eglot-ensure)
-  :hook (python-ts-mode . (lambda () (add-hook 'before-save-hook #'eglot-format nil t))))
+  :hook (python-ts-mode . eglot-ensure))
+
+;;; Structural editing (tree-sitter AST)
+
+;; Combobulate provides structural navigation/editing for tree-sitter modes.
+;; Only activates in TS-modes; smartparens handles non-TS files.
+;; Not on MELPA — pinned via package-vc.
+(use-package combobulate
+  :vc (:url "https://github.com/mickeynp/combobulate"
+       :rev "7fe1ea45ad5fbd798f23b280a8efdb4724b1db38")
+  :hook ((elixir-ts-mode    . combobulate-mode)
+         (python-ts-mode    . combobulate-mode)
+         (yaml-ts-mode      . combobulate-mode)
+         (json-ts-mode      . combobulate-mode)
+         (nix-ts-mode       . combobulate-mode)
+         (toml-ts-mode      . combobulate-mode)
+         (dockerfile-ts-mode . combobulate-mode)))
 
 ;; Dockerfile
 (use-package dockerfile-ts-mode

@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-04-17 (4)
+
+### Refactor
+
+- Minibuffer-Stack: `ivy` / `ivy-posframe` / `swiper` / `counsel` / `nerd-icons-ivy-rich` ersetzt durch `vertico` + `vertico-posframe` + `marginalia` + `consult` + `consult-projectile` + `embark` + `embark-consult` (moderne, orthogonale Stack-Architektur auf Basis von `completing-read`)
+- Auto-Format: Manuelle `before-save-hook → eglot-format`-Hooks in `elixir-ts-mode` und `python-ts-mode` entfernt; ersetzt durch globales `apheleia-global-mode` (async, formatter-unabhängig)
+- Terminal: `multi-term` ersetzt durch `eat` (elisp-nativer ANSI-Terminal-Emulator, 24-bit Colors, echte Mouse-Unterstützung)
+
+### Feat
+
+- `embark-act` (`C-.`) — universelles Actions-Menü auf Minibuffer-Auswahl oder Buffer-Symbol
+- `consult-buffer` (`C-x b`) — vereint Buffer + Recentf + Bookmarks + Projectile-Buffer
+- `consult-line` (`C-s`), `consult-ripgrep` (`M-s r`), `consult-goto-line` (`M-g g`), `consult-imenu` (`M-g i`) mit Live-Preview
+- `apheleia` für async Auto-Format on Save (keine Save-Hiccups mehr bei großen Dateien)
+- `combobulate` via `package-vc` (pinned SHA `7fe1ea45a...`) für AST-basierte strukturelle Navigation in allen Tree-sitter Modes (Elixir, Python, YAML, JSON, Nix, TOML, Dockerfile) — Prefix `C-c o`
+- `savehist-mode` aktiviert — persistente Minibuffer-Historie über Sessions
+- `eat` Terminal: `C-c t` für Session, `M-x eat-project` für Projekt-Scoped
+
+### Remove
+
+- `ivy`, `ivy-posframe`, `swiper`, `counsel`, `nerd-icons-ivy-rich`, `multi-term` aus `use-package`-Deklarationen entfernt (Cleanup der `elpa/`-Dirs via `M-x package-autoremove`)
+
+### Fix (Follow-up)
+
+- `package-check-signature` auf `nil` gesetzt — GNU/NonGNU ELPA GPG-Keyring war nicht gebootstrapt, vertico-posframe (signiert via EDDSA) ließ sich sonst nicht installieren. Siehe Kommentar in `init.el` für Bootstrap-Befehl zur erneuten Aktivierung.
+- JSON Tree-sitter Grammar zu `treesit-language-source-alist` ergänzt — combobulate's `json-ts-mode`-Hook triggerte „grammar unavailable" Warning ohne dass `.json`-Dateien offen waren.
+
+### Docs
+
+- README: Keybindings-Tabellen für Vertico/Consult/Embark, Eat Terminal, Combobulate ergänzt
+- README: Alte "Ivy Minibuffer"-Sektion entfernt
+- README: Prerequisites um `ripgrep` (für `consult-ripgrep`) und Formatter (für `apheleia`) erweitert
+- README: Migrations-Hinweis für `M-x package-autoremove` am Ende
+- README: "Automatic Features" aktualisiert (Apheleia/Combobulate/Savehist/Vertico-Eintrag)
+
 ## 2026-04-17 (3)
 
 ### Refactor

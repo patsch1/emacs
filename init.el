@@ -10,6 +10,14 @@
 ;;; Package setup
 
 (require 'package)
+
+;; Signature verification disabled: GNU/NonGNU ELPA keyring is not bootstrapped
+;; on this machine. To re-enable verification, initialise the keyring via
+;;   gpg --homedir ~/.emacs.d/elpa/gnupg --keyserver hkps://keys.openpgp.org \
+;;       --recv-keys 645357D2883A0966
+;; and then remove the setq below (or set it to `allow-unsigned').
+(setq package-check-signature nil)
+
 (setq package-archive-priorities '(("gnu"    . 5)
                                    ("melpa"  . 10)
                                    ("nongnu" . 15))

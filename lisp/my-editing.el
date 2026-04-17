@@ -15,10 +15,17 @@
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))
 
+;; Async auto-format on save (replaces per-mode eglot-format hooks).
+;; Requires external formatters (black, mix format, prettier, rustfmt, ...).
+(use-package apheleia
+  :config
+  (apheleia-global-mode +1))
+
 ;;; Terminal
 
-(use-package multi-term
-  :custom (multi-term-program (or (getenv "SHELL") "/bin/zsh")))
+(use-package eat
+  :commands (eat eat-project)
+  :bind ("C-c t" . eat))
 
 ;;; Selection & cursors
 

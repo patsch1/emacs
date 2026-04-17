@@ -36,11 +36,6 @@
 (use-package nerd-icons-dired
   :hook (dired-mode . nerd-icons-dired-mode))
 
-(use-package nerd-icons-ivy-rich
-  :init
-  (nerd-icons-ivy-rich-mode 1)
-  (ivy-rich-mode 1))
-
 (use-package nerd-icons-ibuffer
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 

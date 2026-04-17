@@ -10,6 +10,8 @@ Emacs 30+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 | Expert | Elixir LSP | [Releases](https://github.com/elixir-lang/expert/releases) -> `~/.local/bin/expert` |
 | pyright | Python LSP | `pip install pyright` |
 | Cursor CLI | AI Agent | `agent login` zur Authentifizierung |
+| ripgrep | `consult-ripgrep` | `brew install ripgrep` |
+| Formatter | Auto-Format via apheleia | z.B. `brew install black` (Python); `mix format` kommt mit Elixir |
 
 ## Installation
 
@@ -27,8 +29,8 @@ Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
 | `init.el` | Core-Setup: Version-Guard, Package-Management, Base-Settings, Module-Loader |
 | `custom.el` | Emacs Custom (auto-managed, gitignored) |
 | `lisp/my-ui.el` | UI: Font, Line-Numbers, Nerd-Icons, Theme, Treemacs, Modeline, Which-Key, Helpful |
-| `lisp/my-completion.el` | Completion: Ivy + Posframe + Swiper/Counsel, Orderless, Corfu, Cape |
-| `lisp/my-editing.el` | Editing: Projectile, Smartparens, Multi-Term, WS-Butler, Multiple-Cursors, Expand-Region |
+| `lisp/my-completion.el` | Completion: Vertico + Posframe, Orderless, Marginalia, Consult, Embark, Corfu, Cape |
+| `lisp/my-editing.el` | Editing: Projectile, Smartparens, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
 | `lisp/my-git.el` | Git: Magit + diff-hl |
 | `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, pinned revisions) |
 | `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
@@ -51,7 +53,18 @@ Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
 
 | Key | Action |
 |---|---|
-| `C-s` | Swiper (fuzzy search in buffer) |
+| `C-s` | `consult-line` (fuzzy search im Buffer) |
+| `C-x b` | `consult-buffer` (Buffer + Recentf + Bookmarks) |
+| `M-y` | `consult-yank-pop` |
+| `M-g g` / `M-g M-g` | `consult-goto-line` |
+| `M-g i` | `consult-imenu` |
+| `M-g o` | `consult-outline` |
+| `M-g m` | `consult-mark` |
+| `M-s l` | `consult-line` |
+| `M-s r` | `consult-ripgrep` (benötigt `rg`) |
+| `M-s g` | `consult-grep` |
+| `C-.` | `embark-act` (Action-Menü auf Auswahl/Symbol) |
+| `C-h B` | `embark-bindings` |
 | `C-c C-p` | Treemacs Sidebar toggle |
 | `s-p` (Cmd+P) | Projectile command map |
 | `s-p p` | Switch project |
@@ -135,14 +148,35 @@ In Magit Status:
 | `M-x k8s` | Kubel starten |
 | `?` | Alle Keybindings im kubel Buffer |
 
-### Ivy Minibuffer
+### Terminal (Eat)
 
 | Key | Action |
 |---|---|
-| `TAB` | Auswahl bestaetigen |
-| `C-j` / `C-k` | Naechster / Vorheriger Eintrag |
-| `C-l` | Auswahl bestaetigen (alt) |
-| `C-d` | Buffer loeschen (im Switch-Buffer) |
+| `C-c t` | Eat Terminal starten |
+| `M-x eat-project` | Eat im Projekt-Root starten |
+
+### Vertico / Consult / Embark
+
+| Key | Action |
+|---|---|
+| `TAB` | Auswahl completen |
+| `RET` | Auswahl bestaetigen |
+| `C-n` / `C-p` | Naechster / Vorheriger Eintrag |
+| `M-<` / `M->` | Erster / Letzter Eintrag |
+| `C-.` | `embark-act` — Action-Menü |
+| `C-;` | `embark-dwim` — Default-Action |
+| (in Minibuffer nach `C-.`) | Zeigt Actions wie: open, copy, kill, grep, ... |
+
+### Structural Editing (Combobulate, in Tree-sitter Modes)
+
+| Key | Action |
+|---|---|
+| `C-c o n` | Next sibling (AST) |
+| `C-c o p` | Previous sibling (AST) |
+| `C-c o u` | Up to parent |
+| `C-c o d` | Down into first child |
+| `C-c o C-M-k` | Kill node |
+| `?` | Alle Combobulate-Bindings im TS-Buffer |
 
 ## Language Modes
 
@@ -160,13 +194,16 @@ In Magit Status:
 
 ## Automatic Features
 
-- **Autocompletion** - Corfu Popup mit Nerd-Icons (orderless matching)
-- **Auto-Format on Save** - Elixir und Python (via eglot)
+- **Minibuffer-Completion** - Vertico (vertikal, posframe) + Marginalia (Annotationen) + Orderless (Fuzzy-Match)
+- **In-Buffer-Completion** - Corfu Popup mit Nerd-Icons (orderless matching)
+- **Auto-Format on Save** - Apheleia (async, ruft externe Formatter wie `black`, `mix format`, `prettier`, ...)
+- **Structural Editing** - Combobulate in Tree-sitter Modes (Prefix: `C-c o`)
 - **Rainbow Delimiters** - Farbige Klammern in allen prog-mode Buffern
 - **Git Fringe Indicators** - diff-hl zeigt Aenderungen im Fringe
 - **Trailing Whitespace** - ws-butler entfernt Whitespace beim Speichern
-- **Smart Parens** - Automatisches Klammer-Matching in prog-mode
+- **Smart Parens** - Automatisches Klammer-Matching in prog-mode (Non-TS)
 - **Which-Key** - Zeigt moegliche Tastenkombinationen nach Prefix
+- **Savehist** - Persistente Minibuffer-Historie ueber Sessions
 
 ## Theme
 
@@ -175,3 +212,9 @@ Doom Zenburn mit Doom Modeline und Nerd-Icons.
 ## macOS
 
 Rechte Option-Taste liefert Sonderzeichen (`]`, `|`, `~`, `@` etc.), linke Option bleibt Meta.
+
+## Migrations-Hinweis
+
+Nach Umstellung von Ivy auf Vertico: `M-x package-autoremove` räumt veraltete Ivy-Pakete aus `elpa/` auf (`ivy`, `ivy-posframe`, `swiper`, `counsel`, `nerd-icons-ivy-rich`, `multi-term`, `ivy-rich`).
+
+Combobulate zeigt beim Erst-Install byte-compile Warnings für `combobulate-test-prelude` und `tuareg` (OCaml-Support) — kann ignoriert werden. Die Warnings stammen aus Upstream-Testdateien und betreffen die Laufzeit nicht.

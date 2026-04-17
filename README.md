@@ -23,10 +23,27 @@ Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
 
 | File | Purpose |
 |---|---|
-| `early-init.el` | Startup-Optimierungen (GC, file-handler) |
-| `init.el` | Hauptkonfiguration (UI, Editor, Git, AI) |
-| `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
+| `early-init.el` | Startup-Optimierungen (GC, file-handler, benannter Startup-Hook) |
+| `init.el` | Core-Setup: Version-Guard, Package-Management, Base-Settings, Module-Loader |
 | `custom.el` | Emacs Custom (auto-managed, gitignored) |
+| `lisp/my-ui.el` | UI: Font, Line-Numbers, Nerd-Icons, Theme, Treemacs, Modeline, Which-Key, Helpful |
+| `lisp/my-completion.el` | Completion: Ivy + Posframe + Swiper/Counsel, Orderless, Corfu, Cape |
+| `lisp/my-editing.el` | Editing: Projectile, Smartparens, Multi-Term, WS-Butler, Multiple-Cursors, Expand-Region |
+| `lisp/my-git.el` | Git: Magit + diff-hl |
+| `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, pinned revisions) |
+| `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
+| `Taskfile.yml` | Dev-Workflow: lint / smoke / clean |
+
+## Development
+
+Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
+
+| Kommando | Zweck |
+|---|---|
+| `task` oder `task --list` | Verfügbare Tasks auflisten |
+| `task lint` | Byte-compile aller `.el`-Dateien |
+| `task smoke` | Batch-Load von `init.el` prüfen |
+| `task clean` | `.elc`-Dateien entfernen |
 
 ## Keybindings
 

@@ -1,0 +1,22 @@
+version: '3'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  lint:
+    desc: Byte-compile all elisp files (fails on warnings with -Werror)
+    cmds:
+      - emacs --batch -L lisp -f batch-byte-compile early-init.el init.el lisp/*.el
+
+  smoke:
+    desc: Verify init.el loads without errors in batch mode
+    cmds:
+      - emacs --batch -l early-init.el -l init.el --eval '(message "init OK")'
+
+  clean:
+    desc: Remove byte-compiled files
+    cmds:
+      - find . -name '*.elc' -delete

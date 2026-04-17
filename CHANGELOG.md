@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-04-17 (3)
+
+### Refactor
+
+- Modulare Struktur: `init.el` von 275 auf ~85 Zeilen reduziert; UI/Completion/Editing/Git/AI in `lisp/my-*.el` ausgelagert (`my-ui`, `my-completion`, `my-editing`, `my-git`, `my-ai`)
+- Library-Header mit File-Local-Vars kombiniert in allen `.el`-Dateien (Standard-Emacs-Idiom: `;;; file.el --- Description -*- lexical-binding: t; -*-`)
+- `early-init.el`: Anonyme Startup-Lambdas durch benannte `my/restore-startup-settings` ersetzt (Docstring, per `remove-hook` entfernbar)
+- `init.el`: Section-Headers (`;;; Version guard`, `;;; Package setup`, `;;; Base settings`, `;;; Modules`) für outline-mode-Navigation
+- Kommentar zu `custom.el`-Lade-Reihenfolge präzisiert (Warnung gegen `M-x customize` für Package-Settings)
+
+### Feat
+
+- Emacs-Version-Guard: klarer Fehler beim Start mit Emacs < 30.1 (statt stumm fehlschlagendem `use-package :vc`)
+- `Taskfile.yml` für lint / smoke / clean als Dev-Workflow (Dogfooding des Taskfile-Supports)
+- `.gitignore`: `*.elc` ergänzt (kein versehentliches Committen von byte-compiled Dateien nach `task lint`)
+
+### Fix
+
+- `shell-maker` und `acp` auf `:defer t` — keine eager load mehr bei Startup (wurden vorher geladen obwohl `agent-shell` deferred ist)
+- `diff-hl-flydiff-mode` entfernt — Markierungen updaten jetzt nur bei Save/Magit-Refresh (weniger Hintergrund-Last in großen Repos)
+
+### Docs
+
+- README: File-Structure-Tabelle um alle Module erweitert
+- README: Neue `## Development`-Sektion mit Task-Kommandos
+
 ## 2026-04-17 (2)
 
 ### Feat

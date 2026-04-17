@@ -24,5 +24,8 @@ projects
 # Emacs custom (regenerated automatically)
 custom.el
 
+# Byte-compiled elisp
+*.elc
+
 # OS files
 .DS_Store

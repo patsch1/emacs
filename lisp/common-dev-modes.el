@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;;; common-dev-modes.el --- Language modes (Elixir, Python, YAML, Nix, etc.) -*- lexical-binding: t; -*-
 
 ;; Treesitter
 ;; Both GUI app and Homebrew CLI must be the same Emacs version to avoid

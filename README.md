@@ -12,6 +12,7 @@ Emacs 30+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 | Cursor CLI | AI Agent | `agent login` zur Authentifizierung |
 | ripgrep | `consult-ripgrep` | `brew install ripgrep` |
 | Formatter | Auto-Format via apheleia | z.B. `brew install black` (Python); `mix format` kommt mit Elixir |
+| eat terminfo | 24-bit Farben in `eat`-Terminal | siehe [Terminal Setup](#terminal-setup-eat-terminfo) |
 
 ## Installation
 
@@ -20,6 +21,22 @@ git clone <repo-url> ~/.emacs.d
 ```
 
 Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
+
+### Terminal-Setup (eat terminfo)
+
+`eat` liefert eigene terminfo-Einträge (`eat-truecolor`, `eat-256color`, `eat-color`, `eat-mono`) mit, die nach dem Erst-Install einmalig in `~/.terminfo/` kompiliert werden müssen, damit Shells innerhalb eat sie finden:
+
+```bash
+tic -x -o ~/.terminfo ~/.emacs.d/elpa/eat-*/eat.ti
+```
+
+Verifizieren:
+
+```bash
+infocmp eat-truecolor | head -3
+```
+
+Hintergrund: Ohne diesen Schritt fallen Shell-rc-Files mit `TERM`-Checks (`[[ $TERM == xterm* ]] ...`) durch oder Programme beschweren sich über `unknown terminal`. Betrifft vor allem User mit Terminals, die selbst exotische TERMs setzen (z.B. Ghostty: `TERM=xterm-ghostty`) — in eat wird das zwar ohnehin auf `eat-truecolor` überschrieben, die terminfo-DB muss den Eintrag aber kennen.
 
 ## File Structure
 

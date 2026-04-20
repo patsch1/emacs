@@ -23,6 +23,9 @@
 
 ;;; Terminal
 
+;; eat ships its own terminfo (eat-truecolor et al.).  The README documents
+;; the one-time `tic' step to install it into ~/.terminfo so shells inside
+;; eat render with 24-bit true color.
 (use-package eat
   :commands (eat eat-project)
   :bind ("C-c t" . eat))

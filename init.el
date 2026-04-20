@@ -91,6 +91,7 @@ Re-signals the error from the retry if it still fails."
 (require 'my-completion)
 (require 'my-editing)
 (require 'my-git)
+(require 'my-windows)
 (require 'my-ai)
 (require 'common-dev-modes)
 

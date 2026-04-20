@@ -32,6 +32,7 @@ Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
 | `lisp/my-completion.el` | Completion: Vertico + Posframe, Orderless, Marginalia, Consult, Embark, Corfu, Cape |
 | `lisp/my-editing.el` | Editing: Projectile, Smartparens, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
 | `lisp/my-git.el` | Git: Magit + diff-hl |
+| `lisp/my-windows.el` | Window-Navigation: ace-window + windmove |
 | `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, pinned revisions) |
 | `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
 | `Taskfile.yml` | Dev-Workflow: lint / smoke / clean |
@@ -69,6 +70,20 @@ Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
 | `s-p` (Cmd+P) | Projectile command map |
 | `s-p p` | Switch project |
 | `s-p f` | Find file in project |
+
+### Window-Navigation
+
+| Key | Action |
+|---|---|
+| `M-o` | `ace-window` (Buchstaben-Overlay auf jedem Fenster, Sprung in 1 Tastendruck) |
+| `C-x o` | `ace-window` (Drop-in-Replacement für eingebautes `other-window`) |
+| `S-<left>` / `S-<right>` | windmove links/rechts |
+| `S-<up>` / `S-<down>` | windmove hoch/runter |
+
+Hinweise:
+- `aw-scope` ist auf `frame` gesetzt — ace-window switcht nur innerhalb des aktuellen Frames. Für Multi-Frame-Switch nutze `C-x 5 o` (`other-frame`).
+- Home-Row-Letters für ace-window: `a s d f g h j k l`.
+- `S-<arrows>` kollidiert mit `org-mode`. Falls du org aktiv nutzt, setze vor org-Load `(setq org-replace-disputed-keys t)` oder ändere den Modifier in `lisp/my-windows.el`.
 
 ### Treemacs (Sidebar)
 

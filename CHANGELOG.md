@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-04-17 (5)
+
+### Feat
+
+- Window-Navigation: `ace-window` als Drop-in-Replacement für `other-window` auf `M-o` und `C-x o` (Buchstaben-Overlay mit Home-Row-Keys, scope = `frame`)
+- Window-Navigation: `windmove` (built-in) auf `S-<left/right/up/down>` für direktionales Springen mit `windmove-wrap-around`
+- Neues Modul `lisp/my-windows.el` (konsistent mit modularem Layout)
+
+### Docs
+
+- README: Neue Sektion "Window-Navigation" mit Bindings-Tabelle und Hinweis zum org-mode-Konflikt mit `S-<arrows>`
+- README: `lisp/my-windows.el` in File-Structure-Tabelle ergänzt
+
 ## 2026-04-17 (4)
 
 ### Refactor

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-04-17 (6)
+
+### Feat
+
+- Terraform: `terraform-mode` (MELPA) für `.tf` und `.tfvars`, eglot + `terraform-ls` (gated auf `executable-find`), Auto-Format on Save via apheleia (`terraform fmt` — apheleia ships den Adapter out-of-the-box)
+- Tree-sitter HCL Grammar zu `treesit-language-source-alist` ergänzt — kompiliert beim Start, wartet auf künftigen `hcl-ts-mode` (in Emacs 30 noch nicht vorhanden)
+- Ansible: `ansible` Minor-Mode mit Auto-Enable in `yaml-ts-mode` basierend auf Pfad-Pattern (`roles/**/tasks`, `group_vars`, `host_vars`, `inventory`, `playbook*.yml`, `site.yml`) via neuer Helper-Funktion `my/ansible-maybe-enable`
+- Jinja2: `jinja2-mode` für `.j2` / `.jinja2` (typisch bei Ansible-Templates)
+
+### Docs
+
+- README: Prerequisites um `terraform-ls` und `terraform` CLI erweitert
+- README: Language-Modes-Tabelle um Terraform, Ansible, Jinja2 ergänzt
+- README: Neuer Unterabschnitt "Ansible Auto-Detection" mit den Pfad-Mustern
+
 ## 2026-04-17 (5)
 
 ### Feat

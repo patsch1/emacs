@@ -14,7 +14,8 @@
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")
           (json "https://github.com/tree-sitter/tree-sitter-json")
-          (nix "https://github.com/nix-community/tree-sitter-nix")))
+          (nix "https://github.com/nix-community/tree-sitter-nix")
+          (hcl "https://github.com/MichaHoffmann/tree-sitter-hcl")))
   (setq major-mode-remap-alist
         '((elixir-mode . elixir-ts-mode)
           (python-mode . python-ts-mode)
@@ -38,7 +39,11 @@
   (let ((expert-bin (expand-file-name "~/.local/bin/expert")))
     (when (file-executable-p expert-bin)
       (add-to-list 'eglot-server-programs
-                   `(elixir-ts-mode ,expert-bin "--stdio")))))
+                   `(elixir-ts-mode ,expert-bin "--stdio"))))
+  (let ((terraform-ls-bin (executable-find "terraform-ls")))
+    (when terraform-ls-bin
+      (add-to-list 'eglot-server-programs
+                   `(terraform-mode ,terraform-ls-bin "serve")))))
 
 ;; Elixir (formatting handled by apheleia)
 (use-package elixir-ts-mode
@@ -70,6 +75,16 @@
   :ensure nil
   :mode "\\(?:Dockerfile\\(?:\\..*\\)?\\|\\.[Dd]ockerfile\\)\\'")
 
+;;; Terraform
+;; Classic terraform-mode (MELPA).  Emacs 30 has no hcl-ts-mode yet; the HCL
+;; tree-sitter grammar is still installed above for future migration.
+;; Apheleia ships a `terraform' formatter and a `terraform-mode' mode-alist
+;; entry, so `terraform fmt' on save works out of the box when the
+;; `terraform' CLI is on PATH.
+(use-package terraform-mode
+  :mode ("\\.tf\\'" "\\.tfvars\\'")
+  :hook (terraform-mode . eglot-ensure))
+
 ;; Markdown
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
@@ -78,6 +93,36 @@
 (use-package yaml-mode
   :mode (("\\.ya?ml\\'" . yaml-mode)
          ("\\`[Tt]askfile\\'" . yaml-mode)))
+
+;;; Ansible
+;; Auto-detect Ansible files by path and enable the `ansible' minor-mode
+;; on top of yaml-ts-mode.  Matches common layouts:
+;;   - roles/<name>/{tasks,handlers,vars,defaults,meta}/*.yml
+;;   - group_vars/*, host_vars/*, inventory/*
+;;   - playbook*.yml, site.yml
+(defvar my/ansible-file-regexp
+  (rx (or (: "roles/" (+ (not (any ?/))) "/"
+             (or "tasks" "handlers" "vars" "defaults" "meta") "/"
+             (+ anychar) ".y" (? "a") "ml")
+          (: (or "group_vars" "host_vars" "inventory") "/"
+             (+ anychar) ".y" (? "a") "ml")
+          (: (or "playbook" "site") (* anychar) ".y" (? "a") "ml"))
+      eos)
+  "Regexp matching typical Ansible YAML paths.")
+
+;; Private: consulted by the yaml-ts-mode hook; no @doc per project convention.
+(defun my/ansible-maybe-enable ()
+  (when (and buffer-file-name
+             (string-match-p my/ansible-file-regexp buffer-file-name))
+    (ansible 1)))
+
+(use-package ansible
+  :commands (ansible)
+  :hook (yaml-ts-mode . my/ansible-maybe-enable))
+
+;;; Jinja2 templates (used by Ansible, Salt, Flask, ...)
+(use-package jinja2-mode
+  :mode ("\\.j2\\'" "\\.jinja2\\'"))
 
 ;; Nix
 (use-package nix-ts-mode

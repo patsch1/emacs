@@ -12,6 +12,8 @@ Emacs 30+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 | Cursor CLI | AI Agent | `agent login` zur Authentifizierung |
 | ripgrep | `consult-ripgrep` | `brew install ripgrep` |
 | Formatter | Auto-Format via apheleia | z.B. `brew install black` (Python); `mix format` kommt mit Elixir |
+| terraform-ls | Terraform LSP | `brew install hashicorp/tap/terraform-ls` |
+| terraform | `terraform fmt` via apheleia | `brew install terraform` |
 | eat terminfo | 24-bit Farben in `eat`-Terminal | siehe [Terminal Setup](#terminal-setup-eat-terminfo) |
 
 ## Installation
@@ -223,6 +225,19 @@ In Magit Status:
 | Nix | `nix-ts-mode` | Ja | - |
 | Markdown | `markdown-mode` / `gfm-mode` | - | - |
 | JSON | `json-ts-mode` (built-in) | Ja | - |
+| Terraform | `terraform-mode` (`.tf` / `.tfvars`) | HCL-Grammar installiert (kein `hcl-ts-mode` in Emacs 30) | terraform-ls |
+| Ansible | `ansible` Minor-Mode über `yaml-ts-mode` (Pfad-Auto-Detect) | Ja (via YAML) | - |
+| Jinja2 | `jinja2-mode` (`.j2` / `.jinja2`) | - | - |
+
+### Ansible Auto-Detection
+
+Der `ansible` Minor-Mode aktiviert sich automatisch in `yaml-ts-mode`, sobald der Dateipfad einem dieser Muster entspricht:
+
+- `**/roles/<name>/{tasks,handlers,vars,defaults,meta}/*.yml`
+- `**/group_vars/*.yml`, `**/host_vars/*.yml`, `**/inventory/*.yml`
+- `playbook*.yml`, `site.yml`
+
+Für Terraform ruft `apheleia` beim Speichern `terraform fmt` auf (benötigt `terraform` im PATH).
 
 ## Automatic Features
 

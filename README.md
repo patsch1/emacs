@@ -45,15 +45,17 @@ Hintergrund: Ohne diesen Schritt fallen Shell-rc-Files mit `TERM`-Checks (`[[ $T
 | File | Purpose |
 |---|---|
 | `early-init.el` | Startup-Optimierungen (GC, file-handler, benannter Startup-Hook) |
-| `init.el` | Core-Setup: Version-Guard, Package-Management, Base-Settings, Module-Loader |
+| `init.el` | Core-Setup: Version-Guard, Base-Settings, Module-Loader |
 | `custom.el` | Emacs Custom (auto-managed, gitignored) |
+| `lisp/my-packages.el` | Deklarative Paketliste, Archive und sichere sequenzielle VC-Upgrades |
 | `lisp/my-ui.el` | UI: Font, Line-Numbers, Nerd-Icons, Theme, Treemacs, Modeline, Which-Key, Helpful |
 | `lisp/my-completion.el` | Completion: Vertico + Posframe, Orderless, Marginalia, Consult, Embark, Corfu, Cape |
 | `lisp/my-editing.el` | Editing: Projectile, Smartparens, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
 | `lisp/my-git.el` | Git: Magit + diff-hl |
 | `lisp/my-windows.el` | Window-Navigation: ace-window + windmove |
-| `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, pinned revisions) |
+| `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, jeweils neueste Revision) |
 | `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
+| `test/my-packages-test.el` | ERT-Tests für Paket-Auswahl, Archive und VC-Statusprüfung |
 | `Taskfile.yml` | Dev-Workflow: lint / smoke / clean |
 
 ## Development
@@ -64,8 +66,9 @@ Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
 |---|---|
 | `task` oder `task --list` | Verfügbare Tasks auflisten |
 | `task lint` | Byte-compile aller `.el`-Dateien |
+| `task test` | ERT-Tests für die Paketverwaltung ausführen |
 | `task smoke` | Batch-Load von `init.el` prüfen |
-| `task clean` | `.elc`-Dateien entfernen |
+| `task clean` | Nur `.elc`-Dateien der eigenen Konfiguration entfernen |
 
 ## Keybindings
 
@@ -226,12 +229,12 @@ In Magit Status:
 | Markdown | `markdown-mode` / `gfm-mode` | - | - |
 | JSON | `json-ts-mode` (built-in) | Ja | - |
 | Terraform | `terraform-mode` (`.tf` / `.tfvars`) | HCL-Grammar installiert (kein `hcl-ts-mode` in Emacs 30) | terraform-ls |
-| Ansible | `ansible` Minor-Mode über `yaml-ts-mode` (Pfad-Auto-Detect) | Ja (via YAML) | - |
+| Ansible | `ansible-mode` über `yaml-ts-mode` (Pfad-Auto-Detect) | Ja (via YAML) | - |
 | Jinja2 | `jinja2-mode` (`.j2` / `.jinja2`) | - | - |
 
 ### Ansible Auto-Detection
 
-Der `ansible` Minor-Mode aktiviert sich automatisch in `yaml-ts-mode`, sobald der Dateipfad einem dieser Muster entspricht:
+Der `ansible-mode` aktiviert sich automatisch in `yaml-ts-mode`, sobald der Dateipfad einem dieser Muster entspricht:
 
 - `**/roles/<name>/{tasks,handlers,vars,defaults,meta}/*.yml`
 - `**/group_vars/*.yml`, `**/host_vars/*.yml`, `**/inventory/*.yml`
@@ -251,6 +254,9 @@ Für Terraform ruft `apheleia` beim Speichern `terraform fmt` auf (benötigt `te
 - **Smart Parens** - Automatisches Klammer-Matching in prog-mode (Non-TS)
 - **Which-Key** - Zeigt moegliche Tastenkombinationen nach Prefix
 - **Savehist** - Persistente Minibuffer-Historie ueber Sessions
+- **Recentf + Save Place** - Zuletzt geöffnete Dateien und Cursorpositionen bleiben erhalten
+- **Auto Revert** - Extern geänderte Dateien und Verzeichnisse aktualisieren sich automatisch
+- **Winner + Repeat** - Fensterlayouts rückgängig machen und Befehlsfolgen leichter wiederholen
 
 ## Theme
 
@@ -260,16 +266,19 @@ Doom Zenburn mit Doom Modeline und Nerd-Icons.
 
 Rechte Option-Taste liefert Sonderzeichen (`]`, `|`, `~`, `@` etc.), linke Option bleibt Meta.
 
-## Migrations-Hinweis
+## Package Management
 
-Nach Umstellung von Ivy auf Vertico: `M-x package-autoremove` räumt veraltete Ivy-Pakete aus `elpa/` auf (`ivy`, `ivy-posframe`, `swiper`, `counsel`, `nerd-icons-ivy-rich`, `multi-term`, `ivy-rich`).
+Die direkten Abhängigkeiten stehen explizit in `lisp/my-packages.el`. Dadurch
+kennt `package-autoremove` den Unterschied zwischen benötigten Paketen und
+veralteten Resten. Die früheren Ivy/Counsel-Pakete wurden nach der Umstellung
+auf Vertico entfernt.
 
 Bei VC-Paketen ignoriert die Konfiguration `tests/` und versteckte
 Entwickler-Hilfsdateien während der rekursiven Paketkompilierung. Dadurch
 benötigen `acp`, `agent-shell` und `combobulate` keine reinen
-Entwickler-/Test-Abhängigkeiten beim Installieren oder bei
-`M-x package-vc-upgrade-all`.
+Entwickler-/Test-Abhängigkeiten beim Installieren oder Aktualisieren.
 
 `M-x package-upgrade-all` prüft VC-Pakete sequenziell per `git fetch` und
-vergleicht `HEAD` mit dem jeweiligen Upstream. Bereits aktuelle VC-Pakete
-werden dadurch weder fälschlich als Upgrade gezählt noch erneut kompiliert.
+vergleicht `HEAD` mit dem jeweiligen Upstream. Die Fetches laufen asynchron
+mit einem Timeout von 30 Sekunden. Bereits aktuelle VC-Pakete werden dadurch
+weder fälschlich als Upgrade gezählt noch erneut kompiliert.

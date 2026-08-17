@@ -2,6 +2,21 @@
 
 ;;; Project navigation
 
+;; Restore point positions, notice external changes, and make command sequences
+;; easier to repeat.  All three features are built into Emacs.
+(use-package saveplace
+  :ensure nil
+  :init (save-place-mode 1))
+
+(use-package autorevert
+  :ensure nil
+  :custom (global-auto-revert-non-file-buffers t)
+  :init (global-auto-revert-mode 1))
+
+(use-package repeat
+  :ensure nil
+  :init (repeat-mode 1))
+
 (use-package projectile
   :config
   (projectile-mode +1)

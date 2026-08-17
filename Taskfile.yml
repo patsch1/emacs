@@ -9,7 +9,25 @@ tasks:
   lint:
     desc: Byte-compile all elisp files (fails on warnings with -Werror)
     cmds:
-      - emacs --batch -L lisp -f batch-byte-compile early-init.el init.el lisp/*.el
+      - >-
+        emacs --batch -l early-init.el
+        --eval '(require (quote package))'
+        --eval '(package-initialize)'
+        --eval '(add-to-list (quote load-path)
+        (expand-file-name "lisp" user-emacs-directory))'
+        --eval '(setq byte-compile-error-on-warn t
+        byte-compile-dest-file-function
+        (lambda (file) (expand-file-name
+        (concat (file-name-nondirectory file) "c")
+        temporary-file-directory)))'
+        -f batch-byte-compile early-init.el lisp/*.el test/*.el init.el
+
+  test:
+    desc: Run ERT tests in a fully loaded configuration
+    cmds:
+      - >-
+        emacs --batch -l early-init.el -l init.el -L test
+        -l test/my-packages-test.el -f ert-run-tests-batch-and-exit
 
   smoke:
     desc: Verify init.el loads without errors in batch mode
@@ -17,6 +35,6 @@ tasks:
       - emacs --batch -l early-init.el -l init.el --eval '(message "init OK")'
 
   clean:
-    desc: Remove byte-compiled files
+    desc: Remove bytecode generated beside configuration sources
     cmds:
-      - find . -name '*.elc' -delete
+      - rm -f early-init.elc init.elc lisp/*.elc

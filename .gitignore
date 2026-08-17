@@ -15,6 +15,9 @@ auto-save-list/
 # Session and state files
 .mc-lists.el
 projectile-bookmarks.eld
+projectile-frecency.eld
+recentf
+places
 .cache/
 eshell/
 transient/

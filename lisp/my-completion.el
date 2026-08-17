@@ -2,6 +2,11 @@
 
 ;;; Minibuffer (Vertico + Consult + Marginalia + Embark)
 
+;; Keep a persistent recent-file source for `consult-buffer'.
+(use-package recentf
+  :ensure nil
+  :init (recentf-mode 1))
+
 ;; Persist minibuffer history across sessions; vertico orders by frequency.
 (use-package savehist
   :ensure nil

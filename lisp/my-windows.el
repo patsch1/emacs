@@ -16,6 +16,11 @@
 
 ;;; Code:
 
+;; Undo and redo window-layout changes with C-c <left> / C-c <right>.
+(use-package winner
+  :ensure nil
+  :init (winner-mode 1))
+
 (use-package ace-window
   :bind (("M-o"   . ace-window)
          ("C-x o" . ace-window))

@@ -114,10 +114,10 @@
 (defun my/ansible-maybe-enable ()
   (when (and buffer-file-name
              (string-match-p my/ansible-file-regexp buffer-file-name))
-    (ansible 1)))
+    (ansible-mode 1)))
 
 (use-package ansible
-  :commands (ansible)
+  :commands (ansible-mode)
   :hook (yaml-ts-mode . my/ansible-maybe-enable))
 
 ;;; Jinja2 templates (used by Ansible, Salt, Flask, ...)

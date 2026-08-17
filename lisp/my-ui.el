@@ -8,6 +8,7 @@
   (set-frame-font "SauceCodePro NF 14" nil t))
 
 ;; Relative line-numbers (only in code/text buffers, not magit/dired/help/etc.)
+(defvar display-line-numbers-type)
 (setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
@@ -66,6 +67,7 @@
 (use-package treemacs-nerd-icons
   :after treemacs
   :config
+  (declare-function treemacs-load-theme "treemacs")
   (treemacs-load-theme "nerd-icons"))
 
 (use-package treemacs-projectile

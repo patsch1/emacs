@@ -264,4 +264,12 @@ Rechte Option-Taste liefert Sonderzeichen (`]`, `|`, `~`, `@` etc.), linke Optio
 
 Nach Umstellung von Ivy auf Vertico: `M-x package-autoremove` räumt veraltete Ivy-Pakete aus `elpa/` auf (`ivy`, `ivy-posframe`, `swiper`, `counsel`, `nerd-icons-ivy-rich`, `multi-term`, `ivy-rich`).
 
-Combobulate zeigt beim Erst-Install byte-compile Warnings für `combobulate-test-prelude` und `tuareg` (OCaml-Support) — kann ignoriert werden. Die Warnings stammen aus Upstream-Testdateien und betreffen die Laufzeit nicht.
+Bei VC-Paketen ignoriert die Konfiguration `tests/` und versteckte
+Entwickler-Hilfsdateien während der rekursiven Paketkompilierung. Dadurch
+benötigen `acp`, `agent-shell` und `combobulate` keine reinen
+Entwickler-/Test-Abhängigkeiten beim Installieren oder bei
+`M-x package-vc-upgrade-all`.
+
+`M-x package-upgrade-all` prüft VC-Pakete sequenziell per `git fetch` und
+vergleicht `HEAD` mit dem jeweiligen Upstream. Bereits aktuelle VC-Pakete
+werden dadurch weder fälschlich als Upgrade gezählt noch erneut kompiliert.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-17
+
+### Fix
+
+- `package-vc`-Upgrades kompilieren keine Upstream-`tests/`-Verzeichnisse oder versteckten Entwickler-Hilfsdateien mehr; dadurch verschwinden die irreführenden Fehler zu `combobulate-test-prelude` und `tuareg`
+- `agent-shell` und `combobulate` bleiben byte-kompiliert, werden aber wegen ihrer Upstream-Cross-File-Warnungen von der optionalen JIT-Native-Kompilierung ausgenommen
+- `acp`, `agent-shell` und `combobulate` folgen jetzt konsistent `:rev :newest`, passend zu `package-vc-upgrade-all`
+- `package-upgrade-all` prüft Git-basierte VC-Pakete sequenziell und kompiliert nur tatsächlich geänderte Checkouts; bereits aktuelle VC-Pakete werden nicht mehr dauerhaft als drei ausstehende Upgrades gemeldet
+
 ## 2026-04-17 (6)
 
 ### Feat

@@ -58,10 +58,10 @@
 
 ;; Combobulate provides structural navigation/editing for tree-sitter modes.
 ;; Only activates in TS-modes; smartparens handles non-TS files.
-;; Not on MELPA — pinned via package-vc.
+;; Not on MELPA — track the latest revision via package-vc.
 (use-package combobulate
   :vc (:url "https://github.com/mickeynp/combobulate"
-       :rev "7fe1ea45ad5fbd798f23b280a8efdb4724b1db38")
+       :rev :newest)
   :hook ((elixir-ts-mode    . combobulate-mode)
          (python-ts-mode    . combobulate-mode)
          (yaml-ts-mode      . combobulate-mode)

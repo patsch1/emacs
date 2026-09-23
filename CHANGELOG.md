@@ -27,6 +27,10 @@ Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
 - `savehist-additional-variables` um `kill-ring`, `search-ring` und `regexp-search-ring` erweitert
 - `mode-line-collapse-minor-modes` aktiviert (Emacs 31) — faltet die vielen Minor-Mode-Indikatoren zu einem aufklappbaren Eintrag
 - `org-replace-disputed-keys` auf `t` gesetzt, bevor org je geladen wird; windmove behält damit `S-<arrows>` (`lisp/my-windows.el`)
+- Rechtschreibprüfung via `jinx` (`M-$` / `C-M-$`), aktiv in `text-mode` und `prog-mode`. Läuft über Enchants **AppleSpell**-Provider, also die macOS-Systemprüfung: gelernte Wörter teilen sich `~/Library/Spelling/LocalDictionary` mit allen anderen macOS-Apps
+  - Benötigt `brew install enchant` **und** `~/.config/enchant/enchant.ordering` mit `*:AppleSpell,aspell` — Homebrew zieht aspell als Abhängigkeit mit, und Enchant bevorzugt aspell sonst. Die Datei liegt außerhalb des Repos und ist nicht versioniert
+  - `jinx-languages` bewusst auf `"en de"` statt `"en_US de_DE"`: AppleSpell registriert nur die generischen Tags, aspell zusätzlich `en_US`, und Enchant bevorzugt den exakten Treffer — `en_US` würde also unbemerkt wieder bei aspell landen
+  - Die Tags binden nur den Provider: bei nicht gesetztem `NSPreferredSpellServerLanguage` (macOS-Default) erkennt AppleSpell die Sprache selbst, gemischter Text funktioniert dadurch ohne Umschalten
 
 ### Remove
 
@@ -37,6 +41,8 @@ Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
 
 ### Docs
 
+- README: neuer Abschnitt "Spell Checking (macOS-Rechtschreibprüfung)" mit Setup, Verifikationsbefehlen und den zwei Fallstricken (generische Tags, automatische Spracherkennung)
+- README: Keybindings-Sektion "Rechtschreibprüfung (jinx)", `enchant` in den Prerequisites
 - README: Emacs 30+ → 31+, File-Structure- und Language-Modes-Tabellen aktualisiert
 - README: neue Sektion "LSP & Diagnosen (eglot / flymake)" mit Bindings-Tabelle
 - README: Installationshinweis auf bedarfsgesteuerte Grammar-Installation umgestellt
@@ -46,7 +52,7 @@ Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
 
 - Nicht übernommen: `vc-auto-revert-mode` (Emacs 31) wäre bei bereits aktivem `global-auto-revert-mode` eine echte Teilmenge und damit redundant
 - Nicht übernommen: `delete-trailing-whitespace-mode` (Emacs 31) als Ersatz für `ws-butler` — der Built-in räumt den ganzen Buffer auf statt nur berührte Zeilen und erzeugt dadurch Diff-Rauschen
-- Offen: Rechtschreibprüfung. macOS 26 liefert keine losen Wörterbücher mehr (`/System/Library/Spelling/` ist leer), nur noch `AppleSpell.service` ohne CLI. Emacs kann das nicht direkt ansprechen; einziger Weg wäre `jinx` über Enchant, dessen Upstream einen AppleSpell-Provider listet
+- `flyspell`/`ispell` scheiden auf aktuellem macOS aus: `/System/Library/Spelling/` ist leer, es existiert nur noch `AppleSpell.service` ohne CLI und ohne ispell-kompatible Schnittstelle. Der Weg über Enchant (jinx) ist der einzige, der die Systemprüfung erreicht
 
 ## 2026-08-17
 

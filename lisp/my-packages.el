@@ -29,6 +29,7 @@
     expand-region
     helpful
     jinja2-mode
+    jinx
     kubel
     magit
     marginalia

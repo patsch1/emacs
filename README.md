@@ -15,6 +15,7 @@ Emacs 31+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 | terraform-ls | Terraform LSP | `brew install hashicorp/tap/terraform-ls` |
 | terraform | `terraform fmt` via apheleia | `brew install terraform` |
 | eat terminfo | 24-bit Farben in `eat`-Terminal | siehe [Terminal Setup](#terminal-setup-eat-terminfo) |
+| enchant | Rechtschreibprüfung via `jinx` | `brew install enchant` + siehe [Spell Checking](#spell-checking-macos-rechtschreibprüfung) |
 
 ## Installation
 
@@ -45,6 +46,51 @@ infocmp eat-truecolor | head -3
 
 Hintergrund: Ohne diesen Schritt fallen Shell-rc-Files mit `TERM`-Checks (`[[ $TERM == xterm* ]] ...`) durch oder Programme beschweren sich über `unknown terminal`. Betrifft vor allem User mit Terminals, die selbst exotische TERMs setzen (z.B. Ghostty: `TERM=xterm-ghostty`) — in eat wird das zwar ohnehin auf `eat-truecolor` überschrieben, die terminfo-DB muss den Eintrag aber kennen.
 
+### Spell Checking (macOS-Rechtschreibprüfung)
+
+`jinx` prüft über [Enchant](https://rrthomas.github.io/enchant/), und Enchant bringt
+auf macOS einen **AppleSpell-Provider** mit — also genau die Rechtschreibprüfung, die
+der Rest des Systems nutzt. Gelernte Wörter landen damit in
+`~/Library/Spelling/LocalDictionary` und sind in allen macOS-Apps bekannt, in beide
+Richtungen.
+
+```bash
+brew install enchant
+```
+
+Homebrew zieht `aspell` als harte Abhängigkeit mit, und Enchant bevorzugt aspell.
+Damit AppleSpell gewinnt, braucht es eine Ordering-Datei:
+
+```bash
+mkdir -p ~/.config/enchant
+printf '*:AppleSpell,aspell\n' > ~/.config/enchant/enchant.ordering
+```
+
+> Diese Datei liegt außerhalb des Repos und wird **nicht** mitversioniert — auf einem
+> neuen Rechner ist der Schritt zu wiederholen.
+
+Verifizieren:
+
+```bash
+enchant-lsmod-2                # muss "AppleSpell (AppleSpell Provider)" listen
+enchant-lsmod-2 -lang en       # -> en (AppleSpell)
+enchant-lsmod-2 -lang de       # -> de (AppleSpell)
+```
+
+Zwei Eigenheiten, die leicht verwirren:
+
+- **Generische Sprach-Tags sind Absicht.** `jinx-languages` steht auf `"en de"`, nicht
+  auf `"en_US de_DE"`. AppleSpell registriert nur `en` und `de`; aspell registriert
+  zusätzlich `en_US`. Da Enchant den exakten Tag bevorzugt, würde `en_US` still und
+  leise wieder bei aspell landen.
+- **Die Sprache wählt macOS selbst.** Solange `NSPreferredSpellServerLanguage` nicht
+  gesetzt ist (Default: „Automatisch nach Sprache"), erkennt AppleSpell die Sprache
+  pro Wort. Die Tags binden also den Provider, nicht das Wörterbuch — gemischt
+  deutsch-englischer Text funktioniert dadurch ohne Umschalten.
+
+Das C-Modul von jinx (`jinx-mod.dylib`) wird beim ersten Start automatisch übersetzt;
+dafür genügen die Xcode Command Line Tools und `pkg-config`.
+
 ## File Structure
 
 | File | Purpose |
@@ -55,7 +101,7 @@ Hintergrund: Ohne diesen Schritt fallen Shell-rc-Files mit `TERM`-Checks (`[[ $T
 | `lisp/my-packages.el` | Deklarative Paketliste, Archive und sichere sequenzielle VC-Upgrades |
 | `lisp/my-ui.el` | UI: Font, Line-Numbers, Nerd-Icons, Theme, Treemacs, Modeline, Which-Key, Helpful |
 | `lisp/my-completion.el` | Completion: Vertico + Posframe, Orderless, Marginalia, Consult, Embark, Corfu, Cape |
-| `lisp/my-editing.el` | Editing: Projectile, Dired, Electric-Pair, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
+| `lisp/my-editing.el` | Editing: Projectile, Dired, Electric-Pair, Apheleia, WS-Butler, Jinx, Eat-Terminal, Multiple-Cursors, Expand-Region |
 | `lisp/my-git.el` | Git: Magit, diff-hl, Ediff (Single-Frame-Layout) |
 | `lisp/my-windows.el` | Window-Navigation: ace-window + windmove |
 | `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, jeweils neueste Revision) |
@@ -134,6 +180,15 @@ ein Sprachserver läuft bzw. `flymake-mode` aktiv ist.
 
 `M-.` (`xref-find-definitions`) und `M-?` (`xref-find-references`) sind Emacs-Defaults
 und funktionieren mit eglot ohne zusätzliche Konfiguration.
+
+### Rechtschreibprüfung (jinx)
+
+| Key | Action |
+|---|---|
+| `M-$` | `jinx-correct` — Korrekturvorschläge für das Wort am Punkt (ersetzt `ispell-word`) |
+| `C-M-$` | `jinx-languages` — Sprachen für den aktuellen Buffer wechseln |
+
+Aktiv in `text-mode` und `prog-mode`; in Code werden nur Kommentare und Strings geprüft.
 
 ### Treemacs (Sidebar)
 
@@ -290,6 +345,7 @@ Für Terraform ruft `apheleia` beim Speichern `terraform fmt` auf (benötigt `te
 - **Dired** - `dired-dwim-target`, Puffer-Wiederverwendung beim Absteigen, rekursives Kopieren
 - **Ediff** - Single-Frame-Layout, Buffer nebeneinander, Fensterlayout wird beim Beenden via `winner-undo` wiederhergestellt
 - **Base-Defaults** - `y`/`n` statt `yes`/`no`, `delete-selection-mode`, Spaces statt Tabs, `context-menu-mode`, Pixel-Scrolling
+- **Rechtschreibprüfung** - jinx prüft nur den sichtbaren Bereich, via Enchant/AppleSpell gegen die macOS-Systemprüfung
 
 ## Theme
 

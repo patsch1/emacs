@@ -64,6 +64,35 @@
   :config
   (apheleia-global-mode +1))
 
+;;; Spell checking
+
+;; jinx only checks the visible part of the buffer, which is what makes it
+;; cheap enough to leave on everywhere.  In prog-mode it restricts itself to
+;; comments and strings.
+;;
+;; It talks to Enchant, and Enchant on macOS carries an AppleSpell provider --
+;; the very spell checker the rest of the system uses.  That means the words
+;; learned here land in ~/Library/Spelling/LocalDictionary and are shared with
+;; every other macOS app, in both directions.
+;;
+;; Requires `brew install enchant' plus an ordering file; see the Spell
+;; Checking section of the README.  Note the generic language tags: AppleSpell
+;; registers "en" and "de", while the aspell dictionaries Homebrew pulls in as
+;; a dependency also register "en_US".  Enchant prefers an exact tag match, so
+;; asking for "en_US" would silently route around macOS back to aspell.
+;;
+;; The tags select the provider, not the dictionary: with
+;; `NSPreferredSpellServerLanguage' unset -- the macOS default, "Automatic by
+;; Language" -- AppleSpell identifies the language itself, so mixed German and
+;; English prose is handled correctly no matter which tag asked for it.
+(use-package jinx
+  :hook ((text-mode . jinx-mode)
+         (prog-mode . jinx-mode))
+  :bind (("M-$"   . jinx-correct)      ; replaces `ispell-word'
+         ("C-M-$" . jinx-languages))
+  :custom
+  (jinx-languages "en de"))
+
 ;;; Terminal
 
 ;; eat ships its own terminfo (eat-truecolor et al.).  The README documents

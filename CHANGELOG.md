@@ -27,9 +27,10 @@ Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
 - `savehist-additional-variables` um `kill-ring`, `search-ring` und `regexp-search-ring` erweitert
 - `mode-line-collapse-minor-modes` aktiviert (Emacs 31) — faltet die vielen Minor-Mode-Indikatoren zu einem aufklappbaren Eintrag
 - `org-replace-disputed-keys` auf `t` gesetzt, bevor org je geladen wird; windmove behält damit `S-<arrows>` (`lisp/my-windows.el`)
-- Rechtschreibprüfung via `jinx` (`M-$` / `C-M-$`), aktiv in `text-mode` und `prog-mode`. Läuft über Enchants **AppleSpell**-Provider, also die macOS-Systemprüfung: gelernte Wörter teilen sich `~/Library/Spelling/LocalDictionary` mit allen anderen macOS-Apps
+- Rechtschreibprüfung via `jinx` (`M-$`, `C-M-$`, `C-c s n/p/a`), aktiv in `text-mode` und `prog-mode`. Läuft über Enchants **AppleSpell**-Provider, also die macOS-Systemprüfung: gelernte Wörter teilen sich `~/Library/Spelling/LocalDictionary` mit allen anderen macOS-Apps
   - Benötigt `brew install enchant` **und** `~/.config/enchant/enchant.ordering` mit `*:AppleSpell,aspell` — Homebrew zieht aspell als Abhängigkeit mit, und Enchant bevorzugt aspell sonst. Die Datei liegt außerhalb des Repos und ist nicht versioniert
   - `jinx-languages` bewusst auf `"en de"` statt `"en_US de_DE"`: AppleSpell registriert nur die generischen Tags, aspell zusätzlich `en_US`, und Enchant bevorzugt den exakten Treffer — `en_US` würde also unbemerkt wieder bei aspell landen
+  - Navigation auf eigenem `C-c s`-Präfix statt auf `M-n`/`M-p` in der `jinx-mode-map`: dort kollidierten sie in prog-mode mit den Flymake-Bindings, und zwischen zwei Minor-Mode-Maps entscheidet die Ladereihenfolge. `jinx-next`/`jinx-previous` sind ab Werk nur in `jinx-overlay-map` erreichbar, also erst wenn der Punkt schon auf einem markierten Wort steht
   - Die Tags binden nur den Provider: bei nicht gesetztem `NSPreferredSpellServerLanguage` (macOS-Default) erkennt AppleSpell die Sprache selbst, gemischter Text funktioniert dadurch ohne Umschalten
 
 ### Remove

@@ -88,8 +88,19 @@
 (use-package jinx
   :hook ((text-mode . jinx-mode)
          (prog-mode . jinx-mode))
-  :bind (("M-$"   . jinx-correct)      ; replaces `ispell-word'
-         ("C-M-$" . jinx-languages))
+  ;; `jinx-correct' walks every misspelling in the visible window inside a
+  ;; `save-excursion', so point need not be on the word.  Its siblings are
+  ;; reachable only from `jinx-overlay-map' (M-n/M-p while standing on a
+  ;; marked word), which is useless when you have already moved past it --
+  ;; hence the explicit prefix.  Deliberately not M-n/M-p in `jinx-mode-map':
+  ;; flymake already owns those in prog-mode, and between two minor-mode maps
+  ;; the winner depends on load order.  `repeat-mode' is on, so jinx's own
+  ;; repeat map allows bare n/p/$ to continue after the first jump.
+  :bind (("M-$"     . jinx-correct)    ; replaces `ispell-word'
+         ("C-M-$"   . jinx-languages)
+         ("C-c s n" . jinx-next)
+         ("C-c s p" . jinx-previous)
+         ("C-c s a" . jinx-correct-all))
   :custom
   (jinx-languages "en de"))
 

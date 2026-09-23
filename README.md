@@ -185,10 +185,23 @@ und funktionieren mit eglot ohne zusätzliche Konfiguration.
 
 | Key | Action |
 |---|---|
-| `M-$` | `jinx-correct` — Korrekturvorschläge für das Wort am Punkt (ersetzt `ispell-word`) |
+| `M-$` | `jinx-correct` — korrigiert **alle** Fundstellen im sichtbaren Fenster, der Punkt muss nicht auf dem Wort stehen |
+| `C-c s a` | `jinx-correct-all` — ganzer Buffer (oder aktive Region), mit Fortschritt `(3 of 12)` |
+| `C-c s n` / `C-c s p` | Zur nächsten / vorigen Fundstelle springen |
 | `C-M-$` | `jinx-languages` — Sprachen für den aktuellen Buffer wechseln |
+| `M-x jinx-correct-word` | Wort **vor dem Punkt** korrigieren, auch wenn es nicht als falsch markiert ist |
 
-Aktiv in `text-mode` und `prog-mode`; in Code werden nur Kommentare und Strings geprüft.
+Aktiv in `text-mode` und `prog-mode`; in Code werden nur Kommentare, Docstrings und
+Strings geprüft (`jinx-include-faces`), Bezeichner bleiben unangetastet.
+
+`jinx-next` / `jinx-previous` sind ab Werk nur in `jinx-overlay-map` gebunden, greifen
+also erst, wenn der Punkt bereits auf einem markierten Wort steht — deshalb zusätzlich
+das `C-c s`-Präfix. Bewusst **nicht** auf `M-n`/`M-p` in der `jinx-mode-map`: dort
+kollidierten sie in prog-mode mit Flymake, und zwischen zwei Minor-Mode-Maps entscheidet
+die Ladereihenfolge. Da `repeat-mode` aktiv ist, genügen nach dem ersten Sprung die
+blanken Tasten `n`, `p` und `$`.
+
+`jinx-correct-all` setzt vorher eine Mark — `C-u C-SPC` bringt dich zurück.
 
 ### Treemacs (Sidebar)
 

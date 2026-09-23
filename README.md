@@ -16,6 +16,8 @@ Emacs 31+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 | terraform | `terraform fmt` via apheleia | `brew install terraform` |
 | eat terminfo | 24-bit Farben in `eat`-Terminal | siehe [Terminal Setup](#terminal-setup-eat-terminfo) |
 | enchant | Rechtschreibprüfung via `jinx` | `brew install enchant` + siehe [Spell Checking](#spell-checking-macos-rechtschreibprüfung) |
+| pkg-config | Baut jinx' C-Modul gegen enchant | `brew install pkg-config` |
+| C-Compiler | dito | `xcode-select --install` (Command Line Tools) |
 
 ## Installation
 
@@ -29,6 +31,22 @@ Tree-sitter-Grammars werden **bei Bedarf** installiert: `treesit-auto-install-gr
 steht auf `ask`, Emacs fragt also beim ersten Öffnen einer Datei nach, deren Grammar
 noch fehlt. Die Bezugsquellen stehen in `treesit-language-source-alist`
 (`lisp/common-dev-modes.el`).
+
+### Nach dem ersten Start
+
+Diese Schritte laufen **nicht** automatisch und müssen einmalig von Hand erledigt
+werden — auf jedem neuen Rechner erneut:
+
+| Schritt | Wozu | Wann nötig |
+|---|---|---|
+| `M-x nerd-icons-install-fonts` | Installiert die Nerd-Icons-Symbolschrift. Ohne sie zeigen Treemacs, Dired, Corfu und die Modeline Platzhalter-Kästchen | Immer |
+| `tic -x -o ~/.terminfo ~/.emacs.d/elpa/eat-*/eat.ti` | terminfo für das `eat`-Terminal, siehe [Terminal-Setup](#terminal-setup-eat-terminfo) | Bei Nutzung von `C-c t` |
+| `~/.config/enchant/enchant.ordering` anlegen | Sonst nutzt jinx aspell statt der macOS-Prüfung, siehe [Spell Checking](#spell-checking-macos-rechtschreibprüfung) | Bei Rechtschreibprüfung |
+| `M-x package-autoremove` | Entfernt Pakete, die nicht mehr in `my/package-selected-packages` stehen | Nach Config-Updates |
+
+Automatisch laufen dagegen: Paketinstallation, das Kompilieren von jinx' C-Modul beim
+ersten Start (benötigt Compiler und `pkg-config`, siehe Prerequisites) und — nach
+Rückfrage — die Installation fehlender Tree-sitter-Grammars.
 
 ### Terminal-Setup (eat terminfo)
 
@@ -88,8 +106,12 @@ Zwei Eigenheiten, die leicht verwirren:
   pro Wort. Die Tags binden also den Provider, nicht das Wörterbuch — gemischt
   deutsch-englischer Text funktioniert dadurch ohne Umschalten.
 
-Das C-Modul von jinx (`jinx-mod.dylib`) wird beim ersten Start automatisch übersetzt;
-dafür genügen die Xcode Command Line Tools und `pkg-config`.
+Das C-Modul von jinx (`jinx-mod.dylib`) wird beim ersten Start automatisch übersetzt.
+Dafür braucht es einen C-Compiler **und** `pkg-config`: ohne pkg-config fällt jinx auf
+fest verdrahtete Pfade (`/usr/include/enchant-2`, `/usr/local/lib`) zurück, die auf
+Apple Silicon ins Leere zeigen — Homebrew liegt dort unter `/opt/homebrew`. Der Bau
+schlägt dann fehl, mit `Jinx: pkgconf or pkg-config not found` im Puffer
+`*jinx module compilation*`.
 
 ## File Structure
 

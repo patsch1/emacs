@@ -42,6 +42,8 @@ Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
 
 ### Docs
 
+- README: neuer Abschnitt "Nach dem ersten Start" mit den manuellen Schritten, die nicht automatisch laufen. `M-x nerd-icons-install-fonts` war bislang **nur** als Kommentar in `lisp/my-ui.el` dokumentiert und fehlte im README komplett
+- README: `pkg-config` und C-Compiler in die Prerequisites aufgenommen — ohne pkg-config fällt jinx beim Modulbau auf `/usr/include/enchant-2` und `/usr/local/lib` zurück, was auf Apple Silicon (Homebrew unter `/opt/homebrew`) fehlschlägt
 - README: neuer Abschnitt "Spell Checking (macOS-Rechtschreibprüfung)" mit Setup, Verifikationsbefehlen und den zwei Fallstricken (generische Tags, automatische Spracherkennung)
 - README: Keybindings-Sektion "Rechtschreibprüfung (jinx)", `enchant` in den Prerequisites
 - README: Emacs 30+ → 31+, File-Structure- und Language-Modes-Tabellen aktualisiert

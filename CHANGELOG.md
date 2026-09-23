@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-09-23
+
+Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.
+
+### Fix
+
+- `task lint` schlug unter Emacs 31 hart fehl: `if-let` ist seit 31.1 obsolet und `byte-compile-error-on-warn` macht daraus einen Fehler — ersetzt durch `if-let*` (`lisp/my-packages.el`)
+- VC-Paket-Upgrades waren unter Emacs 31 zur Laufzeit kaputt: `package-vc--unpack-1` nimmt dort nur noch ein Argument, wurde aber mit zweien aufgerufen. Ersetzt durch die in Emacs 31 öffentliche `package-vc-rebuild`; der `fboundp`-Guard entfällt damit
+- `gc-cons-threshold` blieb nach dem Start dauerhaft auf 100 MB und verursachte lange GC-Pausen — Laufzeitwert auf 16 MB gesenkt (`early-init.el`)
+
+### Refactor
+
+- Tree-sitter: manueller Grammar-Install-Loop und handgepflegte `major-mode-remap-alist` ersetzt durch `treesit-enabled-modes` und `treesit-auto-install-grammar`. Emacs 31 liefert `treesit-major-mode-remap-alist` vorbefüllt aus. Grammars werden nicht mehr bei jedem Start geprüft, sondern bei Bedarf mit Rückfrage installiert
+  - Achtung: `treesit-enabled-modes` hat einen `:set`-Setter — ein einfaches `setq` füllt `major-mode-remap-alist` **nicht**. Deshalb via `:custom`
+- `use-package emacs` → `use-package treesit` (passender Feature-Name für den Block)
+- `smartparens` durch das eingebaute `electric-pair-local-mode` ersetzt: die Konfiguration nutzte smartparens nur für simples Auto-Pairing. Strukturelle Navigation kommt in Emacs 31 von tree-sitter, das `show-paren-mode`, `forward-list`, `up-list` und `down-list` in TS-Modes bedient
+
+### Feat
+
+- eglot-Keybindings auf `eglot-mode-map` (`C-c l` Prefix): rename, code-actions, format, doc-buffer, find-implementation, find-typeDefinition, reconnect, shutdown
+- flymake-Keybindings auf `flymake-mode-map`: `M-n` / `M-p` für nächsten/vorigen Fehler, `C-c e l` / `C-c e p` für Buffer-/Projekt-Diagnosen, `C-c e c` für `consult-flymake`. `flymake-mode-map` war ab Werk leer (nur Menü-Eintrag und Fringe-Klick) — es gab keinen Tastaturweg zu den LSP-Diagnosen
+- Dired-Konfiguration: `dired-dwim-target`, `dired-kill-when-opening-new-dired-buffer`, rekursives Kopieren/Löschen. `dired-use-ls-dired` auf `nil` und Switches auf `-alh`, da macOS BSD-`ls` weder `--dired` noch `--group-directories-first` kennt
+- Ediff-Konfiguration: `ediff-setup-windows-plain` statt separatem Control-Frame, Buffer nebeneinander, `winner-undo` beim Beenden zur Wiederherstellung des Fensterlayouts
+- Base-Defaults in `init.el`: `use-short-answers`, `delete-selection-mode`, `context-menu-mode`, `pixel-scroll-precision-mode`, `indent-tabs-mode nil`, `sentence-end-double-space nil`, `history-delete-duplicates`
+- `savehist-additional-variables` um `kill-ring`, `search-ring` und `regexp-search-ring` erweitert
+- `mode-line-collapse-minor-modes` aktiviert (Emacs 31) — faltet die vielen Minor-Mode-Indikatoren zu einem aufklappbaren Eintrag
+- `org-replace-disputed-keys` auf `t` gesetzt, bevor org je geladen wird; windmove behält damit `S-<arrows>` (`lisp/my-windows.el`)
+
+### Remove
+
+- `yaml-mode` als direkte Abhängigkeit entfernt — Emacs routet `.yaml`/`.yml` ab Werk auf `yaml-ts-mode-maybe`. Nur `Taskfile` (ohne Endung) braucht noch einen expliziten `auto-mode-alist`-Eintrag. Das Paket bleibt als transitive Abhängigkeit von `kubel` installiert
+- `elixir-ts-mode` aus der Paketliste entfernt — seit Emacs 30.1 built-in (zusammen mit `heex-ts-mode`), war ohnehin nie aus ELPA installiert
+- `smartparens` aus der Paketliste entfernt
+- `dockerfile-ts-mode`-Block entfernt: `auto-mode-alist` deckt `Dockerfile` bereits ab
+
+### Docs
+
+- README: Emacs 30+ → 31+, File-Structure- und Language-Modes-Tabellen aktualisiert
+- README: neue Sektion "LSP & Diagnosen (eglot / flymake)" mit Bindings-Tabelle
+- README: Installationshinweis auf bedarfsgesteuerte Grammar-Installation umgestellt
+- README: org-Konflikt-Hinweis bei windmove — wird jetzt automatisch aufgelöst statt als manueller Schritt beschrieben
+
+### Notes
+
+- Nicht übernommen: `vc-auto-revert-mode` (Emacs 31) wäre bei bereits aktivem `global-auto-revert-mode` eine echte Teilmenge und damit redundant
+- Nicht übernommen: `delete-trailing-whitespace-mode` (Emacs 31) als Ersatz für `ws-butler` — der Built-in räumt den ganzen Buffer auf statt nur berührte Zeilen und erzeugt dadurch Diff-Rauschen
+- Offen: Rechtschreibprüfung. macOS 26 liefert keine losen Wörterbücher mehr (`/System/Library/Spelling/` ist leer), nur noch `AppleSpell.service` ohne CLI. Emacs kann das nicht direkt ansprechen; einziger Weg wäre `jinx` über Enchant, dessen Upstream einen AppleSpell-Provider listet
+
 ## 2026-08-17
 
 ### Fix

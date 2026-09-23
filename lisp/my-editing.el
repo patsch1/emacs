@@ -1,4 +1,4 @@
-;;; my-editing.el --- Editing tools (projectile, smartparens, terminal, cursors) -*- lexical-binding: t; -*-
+;;; my-editing.el --- Editing tools (projectile, electric-pair, terminal, cursors) -*- lexical-binding: t; -*-
 
 ;;; Project navigation
 
@@ -22,10 +22,38 @@
   (projectile-mode +1)
   :bind-keymap ("s-p" . projectile-command-map))
 
+;;; Files & directories
+
+;; Dired ships with none of these on; all three are near-universal preferences.
+;; NOTE: macOS has BSD `ls', which supports neither `--dired' nor
+;; `--group-directories-first'.  `dired-use-ls-dired' is pinned to nil so Emacs
+;; skips its probe, and the switches stay BSD-compatible.  With GNU coreutils
+;; installed (brew install coreutils) you could set `insert-directory-program'
+;; to "gls" and add --group-directories-first here.
+(use-package dired
+  :ensure nil
+  :custom
+  (dired-use-ls-dired nil)
+  (dired-listing-switches "-alh")
+  ;; With two dired windows open, default the copy/rename target to the other
+  ;; window's directory.
+  (dired-dwim-target t)
+  ;; Reuse the buffer when descending instead of leaving a trail behind.
+  (dired-kill-when-opening-new-dired-buffer t)
+  ;; Recursive copy/delete without asking for every subdirectory.
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'top))
+
 ;;; Parens & whitespace
 
-(use-package smartparens
-  :hook (prog-mode . smartparens-mode))
+;; Electric Pair replaces smartparens here: this config only ever used
+;; smartparens for plain auto-pairing, and Emacs 31 pairs multiple and
+;; multi-character delimiters natively.  Structural navigation now comes
+;; from tree-sitter, which drives `show-paren-mode', `forward-list',
+;; `up-list' and `down-list' in ts-modes.
+(use-package elec-pair
+  :ensure nil
+  :hook (prog-mode . electric-pair-local-mode))
 
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))

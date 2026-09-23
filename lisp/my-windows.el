@@ -10,9 +10,8 @@
 ;; current frame; use C-x 5 o to switch frames.
 ;;
 ;; Note: S-<arrows> conflicts with org-mode's `org-shift{left,right,up,down}'.
-;; If you start using org-mode heavily, set
-;;   (setq org-replace-disputed-keys t)
-;; *before* loading org, or rebind windmove to a different modifier here.
+;; `org-replace-disputed-keys' is set below, before org is ever loaded, so org
+;; moves those bindings to C-c C-S-<arrows> and windmove keeps S-<arrows>.
 
 ;;; Code:
 
@@ -30,6 +29,12 @@
   (aw-background t)
   (aw-dispatch-always nil)
   (aw-minibuffer-flag t))
+
+;; Must be set before org loads; org reads it at load time only.  Declared
+;; here rather than in an org module because this config has none: the setting
+;; exists purely to protect the windmove bindings below.
+(defvar org-replace-disputed-keys)
+(setq org-replace-disputed-keys t)
 
 (use-package windmove
   :ensure nil

@@ -23,7 +23,6 @@
     doom-modeline
     doom-themes
     eat
-    elixir-ts-mode
     embark
     embark-consult
     exec-path-from-shell
@@ -45,15 +44,13 @@
     projectile
     rainbow-delimiters
     shell-maker
-    smartparens
     terraform-mode
     treemacs
     treemacs-nerd-icons
     treemacs-projectile
     vertico
     vertico-posframe
-    ws-butler
-    yaml-mode)
+    ws-butler)
   "Packages configured directly by this Emacs setup.")
 
 (defconst my/package-archives
@@ -233,7 +230,7 @@ CALLBACK receives (UPDATES CURRENT ERRORS)."
     (cl-labels
         ((next
           (remaining)
-          (if-let ((desc (car remaining)))
+          (if-let* ((desc (car remaining)))
               (progn
                 (message "Checking VC package %s..."
                          (package-desc-name desc))
@@ -270,10 +267,10 @@ CALLBACK receives (UPDATES CURRENT ERRORS)."
                                    "merge" "--ff-only" "@{upstream}")))
     (unless (equal 0 (car merge))
       (error "%s" (cdr merge)))
-    (unless (fboundp 'package-vc--unpack-1)
-      (error "This Emacs version has no compatible package-vc unpack API"))
-    ;; Emacs 30 has no public API for rebuilding an already-updated checkout.
-    (package-vc--unpack-1 pkg-desc (package-desc-dir pkg-desc))))
+    ;; `package-vc-rebuild' is the public API for rebuilding an already
+    ;; updated checkout: it regenerates autoloads, recompiles, builds docs
+    ;; and pulls missing dependencies, without contacting the remote.
+    (package-vc-rebuild pkg-desc)))
 
 (defun my/package-finish-upgrade (archive-upgrades vc-updates vc-current
                                                     vc-errors query)

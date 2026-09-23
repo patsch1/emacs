@@ -8,8 +8,13 @@
   :init (recentf-mode 1))
 
 ;; Persist minibuffer history across sessions; vertico orders by frequency.
+;; The defaults only cover the minibuffer history itself, so the kill ring and
+;; the search rings are added explicitly.
 (use-package savehist
   :ensure nil
+  :custom
+  (savehist-additional-variables
+   '(kill-ring search-ring regexp-search-ring))
   :init (savehist-mode 1))
 
 ;; Vertical minibuffer completion UI on top of Emacs' native `completing-read'

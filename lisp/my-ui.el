@@ -13,7 +13,8 @@
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 
-;; Highlight matching parens (built-in; smartparens handles structural editing)
+;; Highlight matching parens.  In tree-sitter modes Emacs 31 feeds parser
+;; results to show-paren via `treesit-show-paren-data'.
 (show-paren-mode 1)
 
 ;; Color-coded delimiters by nesting depth
@@ -74,6 +75,10 @@
   :after (treemacs projectile))
 
 ;;; Modeline
+
+;; This config enables a lot of minor modes; Emacs 31 can fold them into a
+;; single mode-line indicator that expands on click.
+(setq mode-line-collapse-minor-modes t)
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1))

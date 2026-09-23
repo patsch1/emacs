@@ -1,6 +1,6 @@
 # Emacs Configuration
 
-Emacs 30+ config with tree-sitter, LSP, autocompletion, and Cursor AI integration.
+Emacs 31+ config with tree-sitter, LSP, autocompletion, and Cursor AI integration.
 
 ## Prerequisites
 
@@ -22,7 +22,12 @@ Emacs 30+ config with tree-sitter, LSP, autocompletion, and Cursor AI integratio
 git clone <repo-url> ~/.emacs.d
 ```
 
-Emacs starten - Pakete und Tree-sitter Grammars installieren sich automatisch.
+Emacs starten - Pakete installieren sich automatisch.
+
+Tree-sitter-Grammars werden **bei Bedarf** installiert: `treesit-auto-install-grammar`
+steht auf `ask`, Emacs fragt also beim ersten Öffnen einer Datei nach, deren Grammar
+noch fehlt. Die Bezugsquellen stehen in `treesit-language-source-alist`
+(`lisp/common-dev-modes.el`).
 
 ### Terminal-Setup (eat terminfo)
 
@@ -44,17 +49,17 @@ Hintergrund: Ohne diesen Schritt fallen Shell-rc-Files mit `TERM`-Checks (`[[ $T
 
 | File | Purpose |
 |---|---|
-| `early-init.el` | Startup-Optimierungen (GC, file-handler, benannter Startup-Hook) |
-| `init.el` | Core-Setup: Version-Guard, Base-Settings, Module-Loader |
+| `early-init.el` | Startup-Optimierungen (GC-Threshold beim Start hoch, zur Laufzeit 16 MB; file-handler, benannter Startup-Hook) |
+| `init.el` | Core-Setup: Version-Guard (31.1+), Base-Settings, Module-Loader |
 | `custom.el` | Emacs Custom (auto-managed, gitignored) |
 | `lisp/my-packages.el` | Deklarative Paketliste, Archive und sichere sequenzielle VC-Upgrades |
 | `lisp/my-ui.el` | UI: Font, Line-Numbers, Nerd-Icons, Theme, Treemacs, Modeline, Which-Key, Helpful |
 | `lisp/my-completion.el` | Completion: Vertico + Posframe, Orderless, Marginalia, Consult, Embark, Corfu, Cape |
-| `lisp/my-editing.el` | Editing: Projectile, Smartparens, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
-| `lisp/my-git.el` | Git: Magit + diff-hl |
+| `lisp/my-editing.el` | Editing: Projectile, Dired, Electric-Pair, Apheleia, WS-Butler, Eat-Terminal, Multiple-Cursors, Expand-Region |
+| `lisp/my-git.el` | Git: Magit, diff-hl, Ediff (Single-Frame-Layout) |
 | `lisp/my-windows.el` | Window-Navigation: ace-window + windmove |
 | `lisp/my-ai.el` | AI Agent Shell (Cursor CLI via ACP, jeweils neueste Revision) |
-| `lisp/common-dev-modes.el` | Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
+| `lisp/common-dev-modes.el` | Tree-sitter-Setup, eglot/flymake-Bindings, Sprach-Modi (Elixir, Python, Dockerfile, Nix, YAML/Taskfile, Markdown) + Kubernetes-UI (`kubel`) |
 | `test/my-packages-test.el` | ERT-Tests für Paket-Auswahl, Archive und VC-Statusprüfung |
 | `Taskfile.yml` | Dev-Workflow: lint / smoke / clean |
 
@@ -105,7 +110,30 @@ Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
 Hinweise:
 - `aw-scope` ist auf `frame` gesetzt — ace-window switcht nur innerhalb des aktuellen Frames. Für Multi-Frame-Switch nutze `C-x 5 o` (`other-frame`).
 - Home-Row-Letters für ace-window: `a s d f g h j k l`.
-- `S-<arrows>` kollidiert mit `org-mode`. Falls du org aktiv nutzt, setze vor org-Load `(setq org-replace-disputed-keys t)` oder ändere den Modifier in `lisp/my-windows.el`.
+- `S-<arrows>` kollidiert grundsätzlich mit `org-mode`. `lisp/my-windows.el` setzt deshalb `org-replace-disputed-keys` auf `t`, bevor org je geladen wird — org weicht damit auf `C-c C-S-<arrows>` aus, windmove behält `S-<arrows>`.
+
+### LSP & Diagnosen (eglot / flymake)
+
+Beide Keymaps sind buffer-lokal — die Bindings existieren nur dort, wo tatsächlich
+ein Sprachserver läuft bzw. `flymake-mode` aktiv ist.
+
+| Key | Action |
+|---|---|
+| `C-c l r` | `eglot-rename` |
+| `C-c l a` | `eglot-code-actions` |
+| `C-c l f` | `eglot-format` |
+| `C-c l d` | `eldoc-doc-buffer` (Doku in eigenem Buffer) |
+| `C-c l i` | `eglot-find-implementation` |
+| `C-c l t` | `eglot-find-typeDefinition` |
+| `C-c l R` | `eglot-reconnect` |
+| `C-c l q` | `eglot-shutdown` |
+| `M-n` / `M-p` | Nächster / voriger Flymake-Fehler |
+| `C-c e l` | Diagnosen im Buffer |
+| `C-c e p` | Diagnosen im Projekt |
+| `C-c e c` | `consult-flymake` (durchsuchbare Übersicht) |
+
+`M-.` (`xref-find-definitions`) und `M-?` (`xref-find-references`) sind Emacs-Defaults
+und funktionieren mit eglot ohne zusätzliche Konfiguration.
 
 ### Treemacs (Sidebar)
 
@@ -221,14 +249,15 @@ In Magit Status:
 |---|---|---|---|
 | Elixir | `elixir-ts-mode` | Ja | Expert |
 | Python | `python-ts-mode` | Ja | pyright |
-| Dockerfile | `dockerfile-ts-mode` | Ja | - |
+| Dockerfile | `dockerfile-ts-mode` (built-in `auto-mode-alist`) | Ja | - |
+| HEEx | `heex-ts-mode` (built-in) | Ja | - |
 | TOML | `toml-ts-mode` | Ja | - |
-| YAML | `yaml-ts-mode` (via Remap, Fallback `yaml-mode`) | Ja | - |
+| YAML | `yaml-ts-mode` (built-in `auto-mode-alist`) | Ja | - |
 | Taskfile | `yaml-ts-mode` (`Taskfile.yml` / `Taskfile`) | Ja | - |
 | Nix | `nix-ts-mode` | Ja | - |
 | Markdown | `markdown-mode` / `gfm-mode` | - | - |
 | JSON | `json-ts-mode` (built-in) | Ja | - |
-| Terraform | `terraform-mode` (`.tf` / `.tfvars`) | HCL-Grammar installiert (kein `hcl-ts-mode` in Emacs 30) | terraform-ls |
+| Terraform | `terraform-mode` (`.tf` / `.tfvars`) | HCL-Grammar konfiguriert (kein `hcl-ts-mode` in Emacs 31) | terraform-ls |
 | Ansible | `ansible-mode` über `yaml-ts-mode` (Pfad-Auto-Detect) | Ja (via YAML) | - |
 | Jinja2 | `jinja2-mode` (`.j2` / `.jinja2`) | - | - |
 
@@ -251,12 +280,16 @@ Für Terraform ruft `apheleia` beim Speichern `terraform fmt` auf (benötigt `te
 - **Rainbow Delimiters** - Farbige Klammern in allen prog-mode Buffern
 - **Git Fringe Indicators** - diff-hl zeigt Aenderungen im Fringe
 - **Trailing Whitespace** - ws-butler entfernt Whitespace beim Speichern
-- **Smart Parens** - Automatisches Klammer-Matching in prog-mode (Non-TS)
+- **Electric Pair** - Automatisches Klammer-Matching in prog-mode (built-in; paart seit Emacs 31 auch mehrzeichige Delimiter)
 - **Which-Key** - Zeigt moegliche Tastenkombinationen nach Prefix
-- **Savehist** - Persistente Minibuffer-Historie ueber Sessions
+- **Savehist** - Persistente Minibuffer-Historie ueber Sessions, inkl. `kill-ring` und Such-Ringe
 - **Recentf + Save Place** - Zuletzt geöffnete Dateien und Cursorpositionen bleiben erhalten
 - **Auto Revert** - Extern geänderte Dateien und Verzeichnisse aktualisieren sich automatisch
 - **Winner + Repeat** - Fensterlayouts rückgängig machen und Befehlsfolgen leichter wiederholen
+- **Tree-sitter Modes** - `treesit-enabled-modes` schaltet die eingebauten TS-Modes frei; Grammars werden bei Bedarf nachinstalliert (`treesit-auto-install-grammar`)
+- **Dired** - `dired-dwim-target`, Puffer-Wiederverwendung beim Absteigen, rekursives Kopieren
+- **Ediff** - Single-Frame-Layout, Buffer nebeneinander, Fensterlayout wird beim Beenden via `winner-undo` wiederhergestellt
+- **Base-Defaults** - `y`/`n` statt `yes`/`no`, `delete-selection-mode`, Spaces statt Tabs, `context-menu-mode`, Pixel-Scrolling
 
 ## Theme
 

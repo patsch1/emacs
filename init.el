@@ -2,9 +2,9 @@
 
 ;;; Version guard
 
-;; This config targets Emacs 30.1+ (uses use-package :vc and built-in which-key).
-(when (version< emacs-version "30.1")
-  (error "This configuration requires Emacs 30.1 or later (found %s)"
+;; This config targets Emacs 31.1+ (uses treesit-enabled-modes, built-in which-key, electric-pair).
+(when (version< emacs-version "31.1")
+  (error "This configuration requires Emacs 31.1 or later (found %s)"
          emacs-version))
 
 ;;; Package setup
@@ -25,11 +25,31 @@
 (prefer-coding-system 'utf-8)
 
 (setq inhibit-startup-message t)
+
+;; Emacs defaults that predate modern expectations.  All of these are still
+;; off/verbose in 31.1, so they have to be set explicitly.
+(setq use-short-answers t                ; y/n instead of typing yes/no
+      sentence-end-double-space nil      ; single space ends a sentence
+      require-final-newline t            ; already the default; kept explicit
+      history-delete-duplicates t)       ; keep minibuffer history compact
+(setq-default indent-tabs-mode nil)      ; indent with spaces
+
+;; Typing or yanking over an active region replaces it.
+(delete-selection-mode 1)
+
+;; Right-click opens a context menu instead of the old mouse-save-then-kill.
+(context-menu-mode 1)
 (if (fboundp 'menu-bar-mode)   (menu-bar-mode   -1))
 (if (fboundp 'tool-bar-mode)   (tool-bar-mode   -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tooltip-mode)    (tooltip-mode    -1))
 (if (fboundp 'set-fringe-mode) (set-fringe-mode 10))
+
+;; Smooth trackpad scrolling.  Enabled unconditionally rather than behind
+;; `display-graphic-p': under --daemon no frame exists yet at init time, so
+;; that test would wrongly skip it for GUI frames created later.  The mode is
+;; inert on TTY frames.
+(pixel-scroll-precision-mode 1)
 
 ;; macOS: Right Option as normal modifier for special chars (] | ~ @ etc.)
 (defvar ns-right-alternate-modifier)

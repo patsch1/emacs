@@ -48,12 +48,17 @@
          ("M-g i"   . consult-imenu)
          ("M-g m"   . consult-mark)
          ("M-s l"   . consult-line)
+         ;; C-s is consult-line, so plain incremental search would otherwise
+         ;; only be reachable via M-x -- C-r covers backwards only.
+         ("M-s s"   . isearch-forward)
          ("M-s r"   . consult-ripgrep)
          ("M-s g"   . consult-grep)))
 
-;; Bridge consult with projectile (consult-projectile-switch-project etc.)
+;; Bridge consult with projectile (consult-projectile-switch-project etc.).
+;; No `:after': that gated the `:bind' behind both packages already being
+;; loaded, so C-c p p stayed unbound until something else happened to pull
+;; them in.  The autoload created by `:bind' loads the package on first use.
 (use-package consult-projectile
-  :after (consult projectile)
   :bind ("C-c p p" . consult-projectile-switch-project))
 
 ;; Right-click-style action menu for any minibuffer/buffer item

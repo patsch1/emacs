@@ -159,9 +159,10 @@ Setzt [Task](https://taskfile.dev/) voraus (`brew install go-task`).
 | `M-s l` | `consult-line` |
 | `M-s r` | `consult-ripgrep` (benötigt `rg`) |
 | `M-s g` | `consult-grep` |
+| `M-s s` | `isearch-forward` — klassische inkrementelle Suche (`C-s` ist mit `consult-line` belegt, `C-r` bleibt `isearch-backward`) |
 | `C-.` | `embark-act` (Action-Menü auf Auswahl/Symbol) |
 | `C-h B` | `embark-bindings` |
-| `C-c C-p` | Treemacs Sidebar toggle |
+| `C-c T` | Treemacs Sidebar toggle |
 | `s-p` (Cmd+P) | Projectile command map |
 | `s-p p` | Switch project |
 | `s-p f` | Find file in project |
@@ -243,15 +244,21 @@ blanken Tasten `n`, `p` und `$`.
 
 | Key | Action |
 |---|---|
-| `C-c m` | Mark all (DWIM) |
-| `C-M-a` | Mark all like this |
-| `C-M-n` | Mark next like this |
-| `C-M-p` | Mark previous like this |
+| `C->` | Mark next like this |
+| `C-<` | Mark previous like this |
 | `C-M->` | Skip to next like this |
 | `C-M-<` | Skip to previous like this |
-| `C-M-c` | Edit lines (cursor on each line of region) |
-| `C-M-l` | Expand region |
+| `C-c m` | Mark all (DWIM) |
+| `C-c c a` | Mark all like this |
+| `C-c c l` | Edit lines (cursor on each line of region) |
+| `C-=` | Expand region |
 | `C-g` | Beenden |
+
+Bewusst **nicht** im `C-M-`-Bereich: dort liegen Emacs' eigene Sexp-Kommandos
+(`C-M-n`/`C-M-p` = `forward-list`/`backward-list`, `C-M-a` = `beginning-of-defun`,
+`C-M-c` = `exit-recursive-edit`, `C-M-l` = `reposition-window`). Seit Emacs 31 sind
+die Listen-Bewegungen tree-sitter-fähig — genau das Argument, mit dem smartparens
+entfallen konnte —, also müssen sie erreichbar bleiben.
 
 ### Git (Magit)
 
@@ -338,7 +345,7 @@ In Magit Status:
 | Language | Mode | Tree-sitter | LSP |
 |---|---|---|---|
 | Elixir | `elixir-ts-mode` | Ja | Expert |
-| Python | `python-ts-mode` | Ja | pyright |
+| Python | `python-ts-mode` | Ja (ohne combobulate, s.u.) | pyright |
 | Dockerfile | `dockerfile-ts-mode` (built-in `auto-mode-alist`) | Ja | - |
 | HEEx | `heex-ts-mode` (built-in) | Ja | - |
 | TOML | `toml-ts-mode` | Ja | - |
@@ -366,7 +373,7 @@ Für Terraform ruft `apheleia` beim Speichern `terraform fmt` auf (benötigt `te
 - **Minibuffer-Completion** - Vertico (vertikal, posframe) + Marginalia (Annotationen) + Orderless (Fuzzy-Match)
 - **In-Buffer-Completion** - Corfu Popup mit Nerd-Icons (orderless matching)
 - **Auto-Format on Save** - Apheleia (async, ruft externe Formatter wie `black`, `mix format`, `prettier`, ...)
-- **Structural Editing** - Combobulate in Tree-sitter Modes (Prefix: `C-c o`)
+- **Structural Editing** - Combobulate in Tree-sitter Modes (Prefix: `C-c o`) — **ohne Python**: combobulate fragt noch den Node-Typ `expression_list` ab, den neuere tree-sitter-python-Grammars nicht mehr haben. Emacs 31 schaltet daraufhin `combobulate-highlight` ab und warnt bei jedem Python-Puffer. Die Grammar per `:commit` einzufrieren würde `python-ts-mode` auf einer veralteten Version festnageln — kein guter Tausch für zwei dekorative Regeln
 - **Rainbow Delimiters** - Farbige Klammern in allen prog-mode Buffern
 - **Git Fringe Indicators** - diff-hl zeigt Aenderungen im Fringe
 - **Trailing Whitespace** - ws-butler entfernt Whitespace beim Speichern

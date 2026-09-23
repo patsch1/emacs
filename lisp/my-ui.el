@@ -57,8 +57,11 @@
 
 ;;; Treemacs
 
+;; Bound to C-c T, not C-c C-p: `C-c C-<letter>' is reserved for major modes,
+;; and they win -- C-c C-p reached `run-python' in python-ts-mode and
+;; `markdown-outline-previous' in markdown-mode, never Treemacs.
 (use-package treemacs
-  :bind (("C-c C-p" . treemacs-add-and-display-current-project-exclusively)
+  :bind (("C-c T" . treemacs-add-and-display-current-project-exclusively)
          :map treemacs-mode-map
          ([mouse-1] . treemacs-single-click-expand-action))
   :custom
@@ -76,10 +79,10 @@
 
 ;;; Modeline
 
-;; This config enables a lot of minor modes; Emacs 31 can fold them into a
-;; single mode-line indicator that expands on click.
-(setq mode-line-collapse-minor-modes t)
-
+;; NB: `mode-line-collapse-minor-modes' (Emacs 31) is deliberately NOT set --
+;; doom-modeline renders its own mode line and hides minor modes entirely
+;; (`doom-modeline-minor-modes' defaults to nil), so the option would be a
+;; no-op here.  Enable that variable first if you ever want it to matter.
 (use-package doom-modeline
   :init (doom-modeline-mode 1))
 

@@ -99,8 +99,15 @@
 (use-package combobulate
   :vc (:url "https://github.com/mickeynp/combobulate"
        :rev :newest)
+  ;; python-ts-mode is deliberately absent: combobulate still queries the
+  ;; `expression_list' node (combobulate-python.el:244 and :397), which newer
+  ;; tree-sitter-python grammars no longer have.  Emacs 31 degrades gracefully
+  ;; by disabling `combobulate-highlight' for python, but warns on every
+  ;; Python buffer, and the structural rules are affected too.  Pinning the
+  ;; grammar via :commit would fix the query at the cost of freezing
+  ;; python-ts-mode on an outdated grammar -- a bad trade for two decorative
+  ;; highlight rules.  Re-add once upstream catches up.
   :hook ((elixir-ts-mode    . combobulate-mode)
-         (python-ts-mode    . combobulate-mode)
          (yaml-ts-mode      . combobulate-mode)
          (json-ts-mode      . combobulate-mode)
          (nix-ts-mode       . combobulate-mode)

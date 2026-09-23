@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-23 (2)
+
+Review der Gesamtkonfiguration. Vier Dinge waren schlicht wirkungslos, dazu
+Tastenbelegungen, die Emacs-Standardkommandos verdeckten.
+
+### Fix
+
+- `C-c a` (agent-shell) war dauerhaft ungebunden: `:after (acp shell-maker)` bei zwei Abhängigkeiten, die beide `:defer t` ohne eigenen Auslöser sind — sie luden nie, `:after` feuerte nie, `:bind` wurde nie wirksam. `M-x agent-shell` funktionierte weiter über den package.el-Autoload, die Taste nicht. `:after` entfernt; agent-shell zieht beide beim Laden ohnehin selbst
+- Treemacs von `C-c C-p` auf `C-c T` verlegt: `C-c C-<Buchstabe>` ist für Major-Modes reserviert und diese gewinnen — in `python-ts-mode` landete man auf `run-python`, in `markdown-mode` auf `markdown-outline-previous`
+- `projectile` auf `:demand t`: mit `:bind-keymap` allein blieb das Paket deferred, `projectile-mode` aus dem `:config` lief also erst beim ersten `s-p`. Projekt-Erkennung und Mode-Line-Segment waren bis dahin inaktiv
+- `consult-projectile`: `:after (consult projectile)` entfernt — es hielt das `:bind` zurück, bis beide Pakete zufällig geladen waren, `C-c p p` war bis dahin ungebunden. Der Autoload aus `:bind` lädt das Paket bei der ersten Nutzung
+- `mode-line-collapse-minor-modes` wieder entfernt: unter doom-modeline wirkungslos, da dieses die Mode-Line selbst rendert und Minor-Modes gar nicht anzeigt (`doom-modeline-minor-modes` ist nil). Als Kommentar festgehalten, damit es nicht erneut eingebaut wird
+
+### Refactor
+
+- multiple-cursors und expand-region aus dem `C-M-`-Bereich verlegt, der Emacs' eigenen Sexp-Kommandos gehört: `C-M-n`/`C-M-p` (`forward-list`/`backward-list`), `C-M-a` (`beginning-of-defun`), `C-M-c` (`exit-recursive-edit`), `C-M-l` (`reposition-window`). Seit Emacs 31 sind die Listen-Bewegungen tree-sitter-fähig — dasselbe Argument, mit dem smartparens entfallen konnte —, sie waren also auf ihren Standardtasten unerreichbar
+  - Neu: `C->` / `C-<` (mc-Upstream-Konvention), `C-M->` / `C-M-<` für Skip (in vanilla ungebunden), `C-c c a` / `C-c c l`, `C-c m` unverändert, expand-region auf `C-=`
+- `M-s s` auf `isearch-forward` gelegt: `C-s` ist mit `consult-line` belegt, `C-r` blieb `isearch-backward` — vorwärts war die klassische inkrementelle Suche nur noch über `M-x` erreichbar
+
+### Remove
+
+- `python-ts-mode` aus den combobulate-Hooks: combobulate fragt den Node-Typ `expression_list` ab (`combobulate-python.el:244` und `:397`), den neuere tree-sitter-python-Grammars nicht mehr kennen. Emacs 31 deaktiviert daraufhin `combobulate-highlight` für Python und warnt bei jedem Python-Puffer; auch die Struktur-Regeln sind betroffen. Die Grammar per `:commit` zu pinnen hätte `python-ts-mode` dauerhaft auf einer veralteten Grammar festgenagelt — kein guter Tausch. Rückgängig machen, sobald upstream nachzieht (combobulate-HEAD vom 2026-07-23 hat es noch nicht)
+
+### Docs
+
+- README: Keybinding-Tabellen für Treemacs, Multiple Cursors und Navigation aktualisiert, inkl. Begründung für das Meiden des `C-M-`-Bereichs
+- README: Hinweis zu combobulate/Python bei "Structural Editing" und in der Language-Modes-Tabelle
+
 ## 2026-09-23
 
 Migration auf Emacs 31.1. Version-Guard von `30.1` auf `31.1` angehoben.

@@ -17,10 +17,16 @@
   :ensure nil
   :init (repeat-mode 1))
 
+;; `:demand t' on purpose: with `:bind-keymap' alone the package stays
+;; deferred, so `projectile-mode' in `:config' did not run until the first
+;; `s-p' -- project detection and the mode-line segment were inactive until
+;; then, and anything keyed off projectile (see consult-projectile) never
+;; triggered.
 (use-package projectile
+  :demand t
+  :bind-keymap ("s-p" . projectile-command-map)
   :config
-  (projectile-mode +1)
-  :bind-keymap ("s-p" . projectile-command-map))
+  (projectile-mode +1))
 
 ;;; Files & directories
 
@@ -115,17 +121,24 @@
 
 ;;; Selection & cursors
 
+;; Moved off the C-M- range, which belongs to Emacs' own sexp navigation:
+;; C-M-n/C-M-p are `forward-list'/`backward-list', C-M-a is
+;; `beginning-of-defun' and C-M-c is `exit-recursive-edit'.  Those matter more
+;; now than they used to -- Emacs 31 makes the list motions tree-sitter aware,
+;; which is precisely why smartparens could be dropped.  C->/C-< are the
+;; bindings multiple-cursors itself suggests upstream.
 (use-package multiple-cursors
-  :bind (("C-c m"   . mc/mark-all-dwim)
-         ("C-M-c"   . mc/edit-lines)
-         ("C-M-a"   . mc/mark-all-like-this)
-         ("C-M-p"   . mc/mark-previous-like-this)
-         ("C-M-n"   . mc/mark-next-like-this)
-         ("C-M-<"   . mc/skip-to-previous-like-this)
-         ("C-M->"   . mc/skip-to-next-like-this)))
+  :bind (("C->"     . mc/mark-next-like-this)
+         ("C-<"     . mc/mark-previous-like-this)
+         ("C-M->"   . mc/skip-to-next-like-this)     ; unbound in vanilla
+         ("C-M-<"   . mc/skip-to-previous-like-this) ; unbound in vanilla
+         ("C-c m"   . mc/mark-all-dwim)
+         ("C-c c a" . mc/mark-all-like-this)
+         ("C-c c l" . mc/edit-lines)))
 
+;; C-= is expand-region's upstream default; C-M-l is `reposition-window'.
 (use-package expand-region
-  :bind ("C-M-l" . er/expand-region))
+  :bind ("C-=" . er/expand-region))
 
 (provide 'my-editing)
 ;;; my-editing.el ends here
